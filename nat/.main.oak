@@ -166,7 +166,27 @@ fn resolveHTMLBuilding(build) {
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://unpkg.com/kaboom/dist/kaboom.js"></script>
-  <title>Document</title>
+  <title>
+    OKFunk
+  </title>
+
+  <meta name="description" content="An Oak + Kaboom mix of a bunch of cool stuff in the shape of a Dedicated Funkin clone.">
+
+  <!-- Facebook Meta Tags -->
+  <meta property="og:url" content="https://okfunk.replit.app/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="OKFunk">
+  <meta property="og:description" content="An Oak + Kaboom mix of a bunch of cool stuff in the shape of a Dedicated Funkin clone.">
+  <meta property="og:image" content="Okin.png">
+
+  <!-- Twitter Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="twitter:domain" content="okfunk.replit.app">
+  <meta property="twitter:url" content="https://okfunk.replit.app/">
+  <meta name="twitter:title" content="OKFunk">
+  <meta name="twitter:description" content="An Oak + Kaboom mix of a bunch of cool stuff in the shape of a Dedicated Funkin clone.">
+  <meta name="twitter:image" content="Okin.png">
+
 </head>
 <body>
   <script>{{ 0 }}</script>

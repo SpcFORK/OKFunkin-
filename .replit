@@ -17,15 +17,9 @@ PATH = "/home/runner/$REPL_SLUG/.config/bin:$PATH"
 localPort = 9999
 externalPort = 80
 
-[packager]
-language = "oak"
-
-[unitTest]
-language = "oak"
-
 [deployment]
-publicDir = "/"
-deploymentTarget = "static"
+deploymentTarget = "cloudrun"
+run = ["sh", "-c", "oak nat/.main.oak"]
 
 [gitHubImport]
 requiredFiles = [".replit", "replit.nix", ".config"]
