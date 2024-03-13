@@ -1,8 +1,8 @@
-![Oakin](Oakin.png)
+![Okin](Okin.png)
 
-# Oak-WNode
+# Okin
 
-A simple frame for quick building and testing Oak software.
+A simple frame for quick building and testing Oak + Kaboom software.
 
 **Press `RUN` to build and start.**
 
