@@ -1,0 +1,64 @@
+std := import('std')
+rnd := import('random')
+dt := import('datetime')
+
+gwibble := loadFont(
+  'gwibble' |> s()
+  '/fonts/gwibble/font.ttf' |> s()
+)
+
+{ shakey: shakey } := import('../blocks/shakey')
+
+with scene('init') fn {
+
+  names := [
+    'SpectCOW'
+    'SpcFORK'
+    'SpectMEOW'
+    'Midialive'
+    'Seedw'
+    'Spcv'
+    'Comercialcheck'
+    'Bull ahh mf'
+  ]
+
+  name := rnd.choice(names)
+
+  cn_title_text := add([
+    text(
+      name |> s()
+      {
+        font: 'gwibble' |> s()
+        size: 48
+        width: 300
+        align: 'center' |> s()
+      }
+    )
+    color(BLACK)
+    pos(center())
+    anchor('center' |> s())
+
+  ])
+
+  fn SET(v) cn_title_text.opacity <- v
+  fn SHOW SET(1)
+  fn HIDE SET(0)
+  fn TEXT(v) cn_title_text.text <- v
+  
+  shakey(cn_title_text)
+
+  // ---
+
+  track := 0
+  fn _ta(amm) track <- track + amm
+  
+  with wait(_ta(3)) fn {
+    HIDE()
+    TEXT(2024)
+  }
+  
+  with wait(_ta(3)) SHOW
+  
+  with wait(_ta(3)) HIDE
+  with wait(_ta(3/2)) fn() go('game')
+}

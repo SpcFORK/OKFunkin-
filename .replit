@@ -34,9 +34,8 @@ requiredFiles = [".replit", "replit.nix", ".config"]
 
 [languages.javascript]
 pattern = "**/{*.js,*.jsx,*.ts,*.tsx,*.oak}"
-
-[languages.javascript.languageServer]
-start = "typescript-language-server --stdio"
+  [languages.javascript.languageServer]
+  start = "typescript-language-server --stdio"
 
 [languages.html]
 pattern = "**/*.html"

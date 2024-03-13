@@ -1,0 +1,20 @@
+// Self.oak - Props with setters and getters for changing scoped values.
+
+fn createSelf {
+  th_ := {}
+
+  {
+    reco: fn reco(key, val) {
+      th_.(key) <- val
+    }
+    
+    set: fn(key, val) {
+      reco(key, val)
+      val
+    }
+    
+    get: fn(key) th_.(key)
+
+    this: fn() th_
+  }
+}

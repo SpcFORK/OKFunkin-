@@ -1,0 +1,6 @@
+fn boundry(x, y, w, h) ({
+  fn worldify(pos) ({
+    x: (w / 2) - (pos.w / 2)
+    y: (h / 2) - (pos.h / 2)
+  })
+})

@@ -1,0 +1,31 @@
+fn shakey(obj) {
+  ogp := obj.pos
+
+  STOP := false
+
+  fn draw_ if !STOP -> {
+    obj.pos <- ogp.clone().add(
+      rand()
+      rand()
+    )
+  }
+
+  returns := with obj.onUpdate() draw_
+  
+  obj.shakeyMod <- {
+    set: fn set(v) STOP <- v
+    toggle: fn toggle set(!STOP)
+    on: fn on set(true)
+    off: fn off set(false)
+    
+    returns: returns
+    cancel: returns.cancel
+
+    remove: fn {
+      off()
+      cancel()
+    }
+  }
+
+  returns
+}

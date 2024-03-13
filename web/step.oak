@@ -1,0 +1,23 @@
+// Step.oak - 
+
+self := import('self')
+
+fn createStepper {
+  step_self := self.createSelf()
+  with step_self.set('stepNum') 0
+
+  {
+  
+    get: fn get step_self.get('stepNum')
+    set: fn set(am) step_self.set('stepNum', am)
+
+    step: fn step(am) with set() get() + am
+    
+    reset: fn reset set(0)
+    
+    sw: fn sw(am, cb) with wait(step(am)) fn() cb(get())
+  
+  }
+}
+
+mainThread := createStepper()

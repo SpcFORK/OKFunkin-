@@ -5,30 +5,42 @@ fmt := import('fmt')
 path := import('path')
 
 oaka := import('oaka')
-hlp := import('hlp')
 
 // ---
 
-kaboom()
+kaboom({
+  width: 600
+  height: 500
+})
 
-spr := OKloadSprite(
-  'bean'
-  '/sprites/bean.png'
-)
+vv := visualViewport
 
-with scene('main') fn {
+gameWidth := canvas.width
+gameHeight := canvas.height
 
-  bean := add([
-    sprite(spr)
-  ])  
-
+fn worldify() {
+  {
+    x: (vv.width / 2) - (gameWidth / 2)
+    y: (vv.height / 2) - (gameHeight / 2)
+  }
 }
 
-go('main')
+canvasPos := ?
+canvasBorder := ?
+
+document.body.style.backgroundColor := '#000'
+
+fn updateCanvas {
+  canvasPos <- worldify()
+
+  canvas.style.display <- 'flex'
+  canvas.style.position <- 'absolute'
+  canvas.style.left <- canvasPos.x |> s() + 'px'
+  canvas.style.top <- canvasPos.y |> s() + 'px'
+}
+
+updateCanvas()
 
 // ---
 
-// hlp.getExporter().myModule := {}
-
-// - Spectcow
-//   DOCS: https://oaklang.org/lib/
+scenes := import('../scenes/main')

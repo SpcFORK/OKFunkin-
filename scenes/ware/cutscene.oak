@@ -1,0 +1,23 @@
+std := import('std')
+
+stp := import('../../web/step')
+
+_sh := stp.createStepper()
+_sw := _sh.sw
+
+fn _MAKE_Cutscene(sh, sw) fn Cutscene(val, passthru) with std.each(val) fn(i) {
+  if i.1 |> type() {
+    :function -> with sw(i.0) i.1
+
+    _ -> with sw(i.0) fn() passthru(i.1, [sh, sw])
+  }
+}
+
+Cutscene := _MAKE_Cutscene(_sh, _sw)
+
+fn newCut() {{
+  sh: sh := stp.createStepper()
+  sw: sw := sh.sw
+
+  Cutscene: _MAKE_Cutscene(sh, sw)
+}}

@@ -1,0 +1,107 @@
+std := import('std')
+
+// Context
+ac := audioCtx
+dest := ac.destination
+
+// ---
+
+fn getFreq(obj_) {
+  { note: note, octave: octave } := obj_
+
+  fn Err(e) { message: 'Missing value.', error: e, type: :error }
+  if {
+    note = ? -> Err()
+    octave = ? -> Err()
+  }
+
+  NOTES := [
+    'C'
+    'C#'
+    'D'
+    'D#'
+    'E'
+    'E#'
+    'F'
+    'F#'
+    'G'
+    'G#'
+    'A'
+    'A#'
+    'B'
+    'B#'
+  ]
+
+  440 * pow(
+    pow(2, 1 / NOTES |> len())
+    (octave * 12) + with std.find(NOTES) fn(ii) {
+      ii = note
+    }
+  )
+}
+
+fn createGain {{
+  gain: gain := ac.createGain()
+
+  begin: gain.connect(dest)
+
+  createTriangle: fn createTriangle {
+    _osc := ac.createOscillator()
+    _osc.type := 'triangle'
+    _osc.frequency.value <- 440
+    _osc.connect(gain)
+
+    {
+      set: fn set(a) _osc.frequency.value <- a
+      osc: _osc
+      start: _osc.start
+    }
+  }
+
+  createSquare: fn createSquare {
+    _osc := ac.createOscillator()
+    _osc.type := 'square'
+    _osc.frequency.value <- 440
+    _osc.connect(gain)
+
+    {
+      set: fn set(a) _osc.frequency.value <- a
+      osc: _osc
+      start: _osc.start
+    }
+  }
+
+  createWhiteNoise: fn createWhiteNoise {
+    _buffer := ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate)
+    _data := _buffer.getChannelData(0)
+
+    with std.each(_data) fn(ii, i) {
+      _data.(i) <- rand() * 2 - 1
+    }
+
+    _source := ac.createBufferSource()
+    _source.buffer <- _buffer
+    _source.loop <- true
+    _source.connect(gain)
+
+    {
+      start: _source.start
+      src: _source
+    }
+  }
+}}
+
+// --- Ex
+//
+//g := createGain()
+//
+//oscBase := g.createTriangle()
+//
+//with oscBase.set() getFreq({
+//  note: 'C#'
+//  octave: 0.2
+//})
+//
+//oscBase.start()
+//
+//window.getFreq := getFreq

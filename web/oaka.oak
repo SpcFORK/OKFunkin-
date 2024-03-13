@@ -40,16 +40,29 @@ windowBind(
   fn abstr?(thing, op) if type(thing) {
     :string -> op(thing)
   }
+
+  fn windowFullscreen? {
+    window.innerHeight = screen.height
+  }
   
   // ---
+
+  fn clense(args, pos) with abstr?(args.(pos)) fn(it) it <- it |> s()
   
   fn sprite(args...) {
-    with abstr?(args.(0)) fn(it) it <- it |> s()
+    args |> clense(0)
+    
     w.sprite(args...)
   }
   
   fn loadSprite(args...) {
     with kb(w.loadSprite) args
+  }
+
+  fn onKeyDown(args...) {
+    args |> clense(0)
+
+    w.onKeyDown(args...)
   }
 
 )

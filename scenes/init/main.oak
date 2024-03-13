@@ -1,0 +1,185 @@
+// @SPCFORK BOOT
+
+std := import('std')
+
+_b := import('boot')
+
+// ---
+
+// W GLOBALS
+
+// Check if we can play Sounds
+FirstInput? := window.FirstInput? := false
+IS_IFRAME := (window.location != window.parent.location)
+CHROMEOS := navigator.userAgent.includes('CrOS')
+
+fi_ := with onClick() fn {
+  FirstInput? := true
+  fi_.cancel()
+}
+
+// ---
+
+GLOBAL_LOADED_FILES := window.GLOBAL_LOADED_FILES := {
+  txts: ''
+  RIGHTTOPTEXTCHOICES: {}
+  WEEKLIST: {}
+  WEEKSONGS: {}
+  STORYW: {}
+}
+
+// ---
+
+{
+  Transition: Transition
+  PixelTransition: PixelTransition
+} := import('../blocks/Transition')
+
+{ newCut: newCut } := import('../ware/cutscene')
+{ shakey: shakey } := import('../blocks/shakey')
+
+// ---
+
+// @Preload
+
+gwibble := loadFont(
+  'gwibble' |> s()
+  '/fonts/gwibble/font.ttf' |> s()
+)
+
+beanSpr := with loadSprite('bean' |> s(), 'sprites/game/beanfriend.png' |> s()) {
+  x: 0
+  y: 0
+  width: 96
+  height: 76
+  sliceX: 5
+  sliceY: 5
+  anims: {
+    none: { from: 0, to: 0, loop: true, }
+    idle: { from: 0, to: 4, loop: true }
+    left: { from: 5, to: 8, loop: false }
+    down: { from: 9, to: 12, loop: false }
+    up: { from: 13, to: 16, loop: false }
+    right: { from: 17, to: 20, loop: false }
+  }
+}
+
+ghostySpr := with loadSprite('ghosty' |> s(), 'sprites/game/characters/Ghosty.png' |> s()) {
+  x: 0
+  y: 0
+  width: 72 * 2
+  height: 80 * 2
+  sliceX: 2
+  anims: {
+    none: { from: 0, to: 0, loop: true, }
+    idle: { from: 0, to: 1, loop: true }
+  }
+}
+
+menu_logoSpr := OKloadSprite('menu_logo', 'sprites/menu/menu.png')
+loadBarSpr := OKloadSprite('loadBar', 'sprites/loadBar.png')
+loading_tempSpr := OKloadSprite('loading_temp', 'sprites/menu/kblfront.png')
+
+kaboomSpr := OKloadSprite('kaboom', 'sprites/ka.png')
+
+kaboom_bgSpr := OKloadSprite(
+  'kaboom_bg'
+  'sprites/boom.png'
+)
+
+cowingSpr := OKloadSprite('cowing', 'cowingWhite.png')
+
+// Modders !
+window.intialLoad <- {
+  gwibble: gwibble
+  beanSpr: beanSpr
+  ghostySpr: ghostySpr
+  menu_logoSpr: menu_logoSpr
+  loadBarSpr: loadBarSpr
+  loading_tempSpr: loading_tempSpr
+  kaboomSpr: kaboomSpr
+  kaboom_bgSpr: kaboom_bgSpr
+}
+
+with load() Promise.all([
+  fetch('code/txt.txt').
+    then(fn(res) res.text()).
+    then(fn(res) GLOBAL_LOADED_FILES.txts <- res)
+])
+
+// ---
+
+with scene('game') fn {
+
+  setBackground(BLACK)
+
+  firstTrack := newCut()
+
+  txt := with do() '
+    add([
+      text(
+        "KaboomFunkin\\\'",
+        {
+          size: 42,
+          font: "gwibble",
+          align: "center"
+        }
+      ),
+      pos(center()),
+      anchor("center")
+    ])
+  '
+
+  cowingLogo := with add() [
+    pos(center())
+    with anchor() 'center' |> s()
+    scale(0.1)
+  ]
+
+  // @semi-components
+  with shakey() txt
+  with shakey() cowingLogo
+
+  // ---
+
+  cutArr := [
+
+    // Initally Hidden
+    [0, [txt, 0]]
+    [0, [cowingLogo, 0]]
+    
+    [4, [txt, 1]]
+    [3.2, [txt, 0]]
+  ]
+
+  with firstTrack.Cutscene(cutArr) fn(ii) (ii.0).opacity <- ii.1
+}
+
+// ---
+
+with scene('initLoading') fn {
+
+  setBackground(BLACK)
+
+  loader_text := with add() [
+    text(
+      ''
+      {
+        font: 'gwibble' |> s()
+        size: 24
+      }
+    )
+    pos()
+    with anchor() 'topleft' |> s()
+  ]
+
+  fn AddText(text) loader_text.text <- text |> s() << '\n'
+
+  // ---
+
+  AddText('Welcome to OKFunk!!!')
+
+  // @ Asset Loading
+  
+
+}

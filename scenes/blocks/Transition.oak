@@ -1,0 +1,92 @@
+std := import('std')
+
+fn Transition(color_, tw) {
+
+  color_ := color_ |> std.default(BLACK)
+  tw := tw |> std.default(easings.easeOutSine)
+
+  self := {}
+
+  fn createFG {
+    add([
+      rect(width(), height())
+      color(0, 0, 0)
+      opacity(1)
+    ])
+  }
+
+  self.tr <- createFG()
+
+  fn makeTransition(speed, color) {
+    self.tr.opacity <- 0
+    if color != ? -> self.tr.use(color)
+
+    with self.tr.use() fadeIn(speed)
+  }
+
+  self.fadeIn := fn(speed, color) {
+    if color != ? -> self.tr.use(color)
+    makeTransition(speed, color)
+  }
+
+  self.fadeOut := fn(speed, color) {
+    if color != ? -> self.tr.use(color)
+    self.tr.fadeOut(speed)
+  }
+
+  self
+}
+
+fn PixelTransition(color_) {
+  color_ := color_ |> std.default(BLACK)
+  
+  self := {}
+
+  fn createFG {
+    add([
+      rect(width(), height())
+      color(0, 0, 0)
+      opacity(1)
+    ])
+  }
+
+  self.tr <- createFG()
+
+  fn makeTransition(speed, color, amm) {
+    time := 0
+    
+    with std.loop() fn(count, breaker) if {
+      self.tr.opacity < 1 -> with wait(time) fn {
+        time <- time + speed
+        self.tr.opacity <- self.tr.opacity + amm
+      }
+
+      _ -> breaker()
+    }
+  }
+  
+  fn unTransition(speed, color, amm) {
+    time := 0
+    
+    with std.loop() fn(count, breaker) if {
+      self.tr.opacity > 0 -> with wait(time) fn {
+        time <- time + speed
+        self.tr.opacity <- self.tr.opacity - amm
+      }
+
+      _ -> breaker()
+    }
+  }
+
+  self.fadeIn := fn(speed, amm, color) {
+    if color != ? -> self.tr.use(color)
+    makeTransition(speed, color, amm)
+  }
+
+  self.fadeOut := fn(speed, amm, color) {
+    if color != ? -> self.tr.use(color)
+    unTransition(speed, color, amm)
+  }
+
+  self
+}

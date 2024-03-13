@@ -1,0 +1,2 @@
+std := import('std')
+fn toEach(amm, cb) std.range(amm) |> std.each(cb)
