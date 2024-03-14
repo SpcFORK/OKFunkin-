@@ -189,6 +189,7 @@ fn resolveHTMLBuilding(build) {
 
 </head>
 <body>
+  <script src="JS/exports.js" type="module"></script>
   <script>{{ 0 }}</script>
 </body>
 </html>

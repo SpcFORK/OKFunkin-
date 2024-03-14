@@ -8,7 +8,7 @@ oaka := import('oaka')
 
 // ---
 
-kaboom({
+globalThis.k := kaboom({
   width: 600
   height: 500
 })
