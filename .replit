@@ -22,7 +22,7 @@ deploymentTarget = "cloudrun"
 run = ["sh", "-c", "oak nat/.main.oak"]
 
 [gitHubImport]
-requiredFiles = [".replit", "replit.nix", ".config"]
+requiredFiles = [".replit", "replit.nix", ".config", ".config/bin/oak"]
 
 [languages]
 

@@ -18,6 +18,9 @@
 } := import('fs')
 cli := import('cli')
 
+path := import('path')
+json := import('json')
+
 // these 8 magic bytes are appended to the end of any Oak executable that
 // includes a "bundle" at the end of the file, after the executable (e.g. ELF)
 // itself. "oak" is obvious, and 1998-10-15 is a special day. They happen to
@@ -35,10 +38,17 @@ Cli := cli.parse()
 Entry := Cli.opts.entry
 Output := Cli.opts.output |> default(Cli.opts.o)
 Includes := Cli.opts.include
-Interp := Cli.opts.interp |>
-  // NOTE: we can't simply default to Cli.exe because we need an absolute,
-  // fully resolved path to be able to read from this file later.
-  default('.config/bin/oak')
+Interp := Cli.opts.interp
+
+if Interp = ? -> {
+  p_ := 'cartConfig.json'
+  println(p_)
+  
+  res := readFile(p_) |> json.parse()
+  println(res)
+  Interp <- res.interp |> default('.config/bin/oak')
+
+}
 
 println(Interp)
 
