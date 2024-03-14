@@ -25,6 +25,26 @@ fn getFInput(cb) {
   }
 }
 
+fn enterNextH(sce, key?) {
+  key? <- key? |> std.default('enter')
+
+  switched? := false
+
+  nextPressFlag := false
+  nextPress := with onKeyPress(key? |> s()) fn {
+    if !nextPressFlag & !switched? -> {
+      nextPress.cancel()
+      go(sce)
+      nextPressFlag <- true
+    }
+  }
+
+  {{
+    allow: fn() switched? <- false
+    deny: fn() switched? <- true
+  }}
+}
+
 fi_ := getFInput()
 
 // ---
@@ -363,7 +383,14 @@ with scene('intro') fn {
   setBackground(BLACK)
 
   firstTrack := newCut()
+  
+  // ---
 
+  enterNextH('menuScreen')
+  enterNextH('intro', 'escape')
+
+  // ---
+  
   txt := with do() '
     add([
       text(
@@ -443,6 +470,11 @@ with scene('intro') fn {
 
 with scene('menuScreen') fn {
 
+  enterNextH('gameSelect')
+  enterNextH('intro', 'escape')
+  
+  // ---
+
   bpmh := createBeatHandler()
 
   menu_logo := with add() [
@@ -499,6 +531,14 @@ with scene('menuScreen') fn {
     
   }
   
+}
+
+// ---
+
+with scene('gameSelect') fn {
+
+  
+
 }
 
 // ---
