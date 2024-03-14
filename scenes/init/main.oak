@@ -12,14 +12,16 @@ _b := import('boot')
 // W GLOBALS
 
 // Check if we can play Sounds
-FirstInput? := window.FirstInput? := false
+FirstInput? := false
 IS_IFRAME := (window.location != window.parent.location)
 CHROMEOS := navigator.userAgent.includes('CrOS')
 
-fn getFInput {
+fn getFInput(cb) {
   holder := with onClick() fn {
-    FirstInput? := true
+    FirstInput? <- true
     holder.cancel()
+    
+    if cb != ? -> cb()
   }
 }
 
@@ -64,14 +66,24 @@ menuMusic := ?
 
 // ---
 
+currentAudio := {
+  freakyMenu: ?
+}
+
+// ---
+
 fn playMenuMusic {
-  mm <- play(
-    'freakyMenu'
+  currentAudio.freakyMenu <- play(
+    'freakyMenu' |> s()
     {
       volume: 0.5,
       loop: true,
     }
   )
+}
+
+fn stopMenuMusic() if currentAudio.freakyMenu != ? -> {
+  currentAudio.freakyMenu.stop()
 }
 
 fn createPlayer() {
@@ -130,36 +142,6 @@ fn createBeatHandler {
 
 FLAGS? := {
   init?: false
-}
-
-// ---
-
-with scene('inputCheck') fn(data) {
-  { next: next } := data
-
-  fn onNotACPermissed {
-
-    bean := createPlayer()
-
-  }
-
-  if next != ? -> {
-
-    fn checkForAC_Allowed? if (! FirstInput?) | (! IS_IFRAME) {
-      true -> {
-        getFInput()
-
-        onNotACPermissed()
-
-        checkForAC_Allowed?()
-      }
-
-      _ -> next()
-    }
-
-    checkForAC_Allowed?()
-
-  }
 }
 
 // ---
@@ -284,8 +266,8 @@ with scene('initLoading') fn {
     attemptLog(id)
     
     returns := loadSound(
-      name |> s()
-      path |> s()
+      s(name)
+      s(path)
     )
     
     with AddText() returns |> keys()
@@ -306,9 +288,10 @@ with scene('initLoading') fn {
     'sprites/boom.png'
   )
 
-  cowingSpr <- lspr('cowing', 'cowingWhite.png')
+  cowingSpr <- lspr('cowing', '/cowingWhite.png')
 
   lsnd('freakyMenu', 'sounds/freakyMenu.ogg')
+  
   lsnd('confirmMenu', 'sounds/confirmMenu.ogg')
   lsnd('cancelMenu', 'sounds/cancelMenu.ogg')
   lsnd('scrollMenu', 'sounds/scrollMenu.ogg')
@@ -334,18 +317,48 @@ with scene('initLoading') fn {
   // ---
 
   // @ First Input check
-  go(
-    'inputCheck'
-    {
-      next: fn() go('intro')
-    }
-  )
+  go('inputCheck', {
+    next: fn() go('intro')
+  })
 
 }
 
 // ---
 
+with scene('inputCheck') fn(data) {
+  if data.next != ? -> {
+
+    if FirstInput? {
+      false -> getFInput(data.next)
+      true -> data.next()
+    }
+    
+  }
+
+  // ---
+
+  txt := with do() '
+    add([
+      text(
+        "Please press anywhere on the canvas.",
+        {
+          size: 42,
+          width: width() * 0.75,
+          font: "gwibble",
+          align: "center"
+        }
+      ),
+      pos(center()),
+      anchor("center")
+    ])
+  '
+}
+
+// ---
+
 with scene('intro') fn {
+
+  playMenuMusic()
 
   setBackground(BLACK)
 
