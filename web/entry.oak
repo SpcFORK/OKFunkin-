@@ -37,6 +37,9 @@ fn updateCanvas {
   canvas.style.position <- 'absolute'
   canvas.style.left <- canvasPos.x |> s() + 'px'
   canvas.style.top <- canvasPos.y |> s() + 'px'
+  canvas.style.border <- '1px solid rgba(248, 206, 86, 0.25)'
+  canvas.style.borderRadius <- '8px'
+  canvas.style.padding <- '8px'
 }
 
 updateCanvas()

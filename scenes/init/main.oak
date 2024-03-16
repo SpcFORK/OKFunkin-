@@ -34,7 +34,10 @@ fn enterNextH(sce, key?) {
   nextPress := with onKeyPress(key? |> s()) fn {
     if !nextPressFlag & !switched? -> {
       nextPress.cancel()
-      go(sce)
+      
+      Transition(BLACK).fadeIn(2)
+      with wait(2) fn() go(sce)
+      
       nextPressFlag <- true
     }
   }
