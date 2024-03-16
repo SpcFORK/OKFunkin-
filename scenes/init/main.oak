@@ -1,6 +1,8 @@
 // @SPCFORK BOOT
 
 std := import('std')
+Once := std.once
+
 str := import('str')
 json := import('json')
 rng := import('random')
@@ -16,6 +18,10 @@ FirstInput? := false
 IS_IFRAME := (window.location != window.parent.location)
 CHROMEOS := navigator.userAgent.includes('CrOS')
 
+SUPERCOMMONCOLOUR := [248, 206, 86]
+
+// ---
+
 fn getFInput(cb) {
   holder := with onClick() fn {
     FirstInput? <- true
@@ -24,6 +30,9 @@ fn getFInput(cb) {
     if cb != ? -> cb()
   }
 }
+fi_ := getFInput()
+
+// ---
 
 fn enterNextH(sce, key?) {
   key? <- key? |> std.default('enter')
@@ -35,8 +44,8 @@ fn enterNextH(sce, key?) {
     if !nextPressFlag & !switched? -> {
       nextPress.cancel()
       
-      Transition(BLACK).fadeIn(2)
-      with wait(2) fn() go(sce)
+      Transition(BLACK).fadeIn(0.2)
+      with wait(0.2) fn() go(sce)
       
       nextPressFlag <- true
     }
@@ -48,7 +57,21 @@ fn enterNextH(sce, key?) {
   }}
 }
 
-fi_ := getFInput()
+fn playMenuEnter {
+  s('confirmMenu') |> play({
+    volume: 0.5
+  })
+}
+
+fn MEnterTrigger {
+  // @ Sounds
+  DONE_ENTER_SOUND := false
+  with onKeyPress('enter' |> s()) fn if !DONE_ENTER_SOUND -> {
+    DONE_ENTER_SOUND := true
+
+    playMenuEnter()
+  }
+}
 
 // ---
 
@@ -129,7 +152,7 @@ fn createPlayer() {
 }
 
 fn createGhosty() {
-  gh_ := with add() [
+  with add() [
     sprite(
       s('ghosty')
       {
@@ -138,8 +161,77 @@ fn createGhosty() {
       }
     )
     with anchor() 'center' |> s()
+    pos(center())
   ]
 }
+
+// ---
+
+fn createMenuStructure {
+  INFOTEXTCHOICES := {
+    'story mode': 'Story Mode - Play the storyline!'
+    'freeplay': 'Freeplay - Play any song!'
+    'options': 'Options - Change your settings!'
+    'quit': 'Quit - Exit the game!'
+  }
+
+  top := {}
+
+  top.bar <- with add() [
+    rect(width(), 40)
+    pos(0, 0)
+    color(0, 0, 0)
+    z(- 2)
+  ]
+
+  top.topLeftText <- with add() [
+    s('Top Left') |> text({
+      size: 20
+    })
+    pos(5, 5)
+    with anchor() s('topleft')
+    z(-2)
+  ]
+
+  top.topRightText <- with add() [
+    s('Top Right') |> text({
+      size: 20,
+    })
+    pos(width() - 5, 5)
+    with anchor() s('topright')
+    z(-2)
+  ]
+
+  // ---
+
+  bottom := {}
+
+  bottom.bar <- with add() [
+    rect(width(), 200)
+    pos(0, height())
+    color(0, 0, 0)
+    z(-2)
+    with anchor() s('botleft')
+  ]
+
+  bottom.infoText <- with add() [
+    s('Loading...') |> text({
+      size: 20
+    })
+    pos(5, height() - 5)
+    with anchor() s('botleft')
+    z(-2)
+  ]
+
+  // ---
+
+  {{
+    top: top
+    bottom: bottom
+  }}
+}
+
+// ---
 
 fn createBeatHandler {
   lastBeatTime := 0
@@ -244,22 +336,17 @@ with scene('initLoading') fn {
 
   attemptLog('ghosty')
   ghostySpr <- with do() '
-    loadSpriteAtlas("sprites/game/characters/markk.png", {
-      markk: {
+    loadSpriteAtlas("sprites/game/characters/Ghosty.png", {
+      ghosty: {
         x: 0,
         y: 0,
-        width: 80 * 4,
-        height: 70 * 5,
-        sliceX: 4,
-        sliceY: 5,
+        width: 72 * 2,
+        height: 80 * 2,
+        sliceX: 2,
         anims: {
           none: { from: 0, to: 0, loop: true, },
-          idle: { from: 0, to: 4, loop: true },
-          left: { from: 5, to: 8, loop: false },
-          down: { from: 9, to: 12, loop: false },
-          up: { from: 13, to: 16, loop: false },
-          right: { from: 17, to: 20, loop: false },
-        },
+          idle: { from: 0, to: 1, loop: true },
+        }
       }
     })
   '
@@ -475,6 +562,10 @@ with scene('menuScreen') fn {
 
   enterNextH('gameSelect')
   enterNextH('intro', 'escape')
+
+  // ---
+
+  MEnterTrigger()
   
   // ---
 
@@ -540,6 +631,24 @@ with scene('menuScreen') fn {
 
 with scene('gameSelect') fn {
 
+  tabs := createMenuStructure()
+
+  // Yellowish BG
+  with add() [
+    rect(width(), height())
+    color(
+      SUPERCOMMONCOLOUR.0
+      SUPERCOMMONCOLOUR.1
+      SUPERCOMMONCOLOUR.2
+    )
+    z(-3)
+  ]
+
+  bf := createPlayer()
+  gf := createGhosty()
+
+  // bf.pos <- pos(100, height() / 2 - 75)
+  // gf.pos <- pos(width() / 2height() / 2 - 75)
   
 
 }
