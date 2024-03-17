@@ -11,6 +11,15 @@ _b := import('boot')
 
 // ---
 
+// KSink
+
+ksink := loadFont(
+  s('sink')
+  s('/fonts/sink/font.ttf')
+)
+
+// ---
+
 // W GLOBALS
 
 // Check if we can play Sounds
@@ -202,7 +211,8 @@ fn createMenuStructure {
 
   top.topLeftText <- with add() [
     s('Top Left') |> text({
-      size: 20
+      size: 18
+      font: s('sink')
     })
     pos(5, 5)
     with anchor() s('topleft')
@@ -211,7 +221,8 @@ fn createMenuStructure {
 
   top.topRightText <- with add() [
     s('Top Right') |> text({
-      size: 20,
+      size: 18
+      font: s('sink')
     })
     pos(width() - 5, 5)
     with anchor() s('topright')
@@ -232,7 +243,8 @@ fn createMenuStructure {
 
   bottom.infoText <- with add() [
     s('Loading...') |> text({
-      size: 20
+      size: 18
+      font: s('sink')
     })
     pos(5, height() - 5)
     with anchor() s('botleft')
@@ -255,7 +267,7 @@ fn ScrollableMenu(options, colors, w, di) {
   COL1 := colors.0 |> std.default(WHITE)
   COL2 := colors.1 |> std.default(YELLOW)
 
-  WIDTH := w |> std.default(500)
+  WIDTH := w |> std.default(300)
   DIST := di |> std.default(30)
 
   count := options |> len()
@@ -264,7 +276,7 @@ fn ScrollableMenu(options, colors, w, di) {
   scrollBar := with add() [
     pos(
       center().x - (DIST + WIDTH)
-      center().y + 70
+      center().y + 65
     )
   ]
 
@@ -275,9 +287,10 @@ fn ScrollableMenu(options, colors, w, di) {
     with scrollBar.add() [
       text(optionKeys.(ic), {
         align: s('center')
-        size: 28
+        size: 36
         color: WHITE
         width: WIDTH
+        font: s('gwibble')
       })
 
       pos(DIST + (WIDTH * ic) + (WIDTH / 2), 0)
@@ -567,9 +580,9 @@ with scene('inputCheck') fn(data) {
       text(
         "Please press anywhere on the canvas.",
         {
-          size: 42,
+          size: 18,
           width: width() * 0.75,
-          font: "gwibble",
+          font: "sink",
           align: "center"
         }
       ),
