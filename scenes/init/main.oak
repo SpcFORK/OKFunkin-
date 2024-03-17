@@ -233,6 +233,101 @@ fn createMenuStructure {
 
 // ---
 
+fn ScrollableMenu(options, colors, w, di) {
+
+  colors := colors |> std.default([])
+  COL1 := colors.0 |> std.default(WHITE)
+  COL2 := colors.1 |> std.default(YELLOW)
+
+  WIDTH := w |> std.default(500)
+  DIST := di |> std.default(30)
+
+  count := options |> len()
+  ii := 0
+
+  scrollBar := with add() [
+    pos(
+      center().x - (DIST + WIDTH)
+      center().y + 70
+    )
+  ]
+
+  scrollBar.TW := ?
+
+  optionKeys := keys(options)
+  with std.each(options) fn(ii, ic) {
+    with scrollBar.add() [
+      text(optionKeys.(ic), {
+        align: s('center')
+        size: 28
+        color: WHITE
+        width: WIDTH
+      })
+
+      pos(DIST + (WIDTH * ic) + (WIDTH / 2), 0)
+    ]
+  }
+
+  // @ Text stuff
+  (scrollBar.children.0).color <- YELLOW
+
+  {{
+    moveBack: fn moveBack if ii < count - 1 -> {
+      ii <- ii + 1
+    
+      if scrollBar.TW != ? -> scrollBar.TW.finish()
+
+      scrollBar.TW <- tween(
+        scrollBar.pos.x
+        scrollBar.pos.x - WIDTH
+        0.2
+        fn(v) scrollBar.pos.x <- v
+        easings.easeOutQuad
+      )
+
+      textgo := scrollBar.children.(ii)
+
+      with std.each(scrollBar.children) fn(scrollChild, ic) {
+        if ic != ii -> scrollChild.color <- WHITE
+      }
+      
+      textgo.color <- YELLOW
+
+      with scrollBar.TW.onEnd() fn {
+        scrollBar.TW <- ?
+      }
+    }
+
+    moveForward: fn moveForward if ii > 0 -> {
+      ii <- ii - 1
+    
+      if scrollBar.TW != ? -> scrollBar.TW.finish()
+
+      scrollBar.TW <- tween(
+        scrollBar.pos.x
+        scrollBar.pos.x + WIDTH
+        0.2
+        fn(v) scrollBar.pos.x <- v
+        easings.easeOutQuad
+      )
+
+      textgo := scrollBar.children.(ii)
+
+      with std.each(scrollBar.children) fn(scrollChild, ic) {
+        if ic != ii -> scrollChild.color <- WHITE
+      }
+      
+      textgo.color <- YELLOW
+
+      with scrollBar.TW.onEnd() fn {
+        scrollBar.TW <- ?
+      }
+    }
+  }}
+}
+
+// ---
+
 fn createBeatHandler {
   lastBeatTime := 0
 
@@ -633,6 +728,10 @@ with scene('gameSelect') fn {
 
   tabs := createMenuStructure()
 
+  tabs.top.topLeftText.text <- 'Select Tab'
+  tabs.top.topRightText.text <- 'USE ARROW KEYS TO MOVE TABS'
+  tabs.bottom.infoText.text <- '(Press ENTER to select tab)'
+
   // Yellowish BG
   with add() [
     rect(width(), height())
@@ -647,10 +746,41 @@ with scene('gameSelect') fn {
   bf := createPlayer()
   gf := createGhosty()
 
-  // bf.pos <- pos(100, height() / 2 - 75)
-  // gf.pos <- pos(width() / 2height() / 2 - 75)
-  
+  with bf.use() pos(100, center().y - 75)
+  with gf.use() pos(center().x, center().y - 75)
 
+  // ---
+
+  sm := ScrollableMenu({
+    'Story Mode': fn() go('storyMode')
+    'Freeplay': fn() go('freeplay')
+    'Options': fn() go('options')
+    'Credits': fn() go('credits')
+    'Quit': fn() console.log('quit')
+  })
+
+  // ---
+
+  fn moveLeft {
+    
+    sm.moveForward()
+    
+  }
+
+  fn moveRight {
+    
+    sm.moveBack()
+    
+  }
+
+  // ---
+
+  s('left') |> with onKeyPressRepeat() moveLeft
+  s('a') |> with onKeyPressRepeat() moveLeft
+  
+  s('right') |> with onKeyPressRepeat() moveRight
+  s('d') |> with onKeyPressRepeat() moveRight
+  
 }
 
 // ---
