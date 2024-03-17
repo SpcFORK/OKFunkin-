@@ -114,6 +114,7 @@ menuMusic := ?
 
 currentAudio := {
   freakyMenu: ?
+  scrollMenu: ?
 }
 
 // ---
@@ -131,6 +132,21 @@ fn playMenuMusic {
 fn stopMenuMusic() if currentAudio.freakyMenu != ? -> {
   currentAudio.freakyMenu.stop()
 }
+
+fn playTickSound {
+  currentAudio.scrollMenu <-  play(
+    s('scrollMenu')
+    {
+      volume: 0.5
+    }
+  )
+}
+
+fn stopTickSound() if currentAudio.scrollMenu != ? -> {
+  currentAudio.scrollMenu.stop()
+}
+
+// ---
 
 fn createPlayer() {
   with add() [
@@ -272,7 +288,7 @@ fn ScrollableMenu(options, colors, w, di) {
   (scrollBar.children.0).color <- YELLOW
 
   {{
-    moveBack: fn moveBack if ii < count - 1 -> {
+    moveBack: fn moveBack(cb) if ii < count - 1 -> {
       ii <- ii + 1
     
       if scrollBar.TW != ? -> scrollBar.TW.finish()
@@ -296,9 +312,11 @@ fn ScrollableMenu(options, colors, w, di) {
       with scrollBar.TW.onEnd() fn {
         scrollBar.TW <- ?
       }
+
+      cb()
     }
 
-    moveForward: fn moveForward if ii > 0 -> {
+    moveForward: fn moveForward(cb) if ii > 0 -> {
       ii <- ii - 1
     
       if scrollBar.TW != ? -> scrollBar.TW.finish()
@@ -322,6 +340,8 @@ fn ScrollableMenu(options, colors, w, di) {
       with scrollBar.TW.onEnd() fn {
         scrollBar.TW <- ?
       }
+
+      cb()
     }
   }}
 }
@@ -763,13 +783,13 @@ with scene('gameSelect') fn {
 
   fn moveLeft {
     
-    sm.moveForward()
+    with sm.moveForward() fn() playTickSound()
     
   }
 
   fn moveRight {
     
-    sm.moveBack()
+    with sm.moveBack() fn() playTickSound()
     
   }
 
