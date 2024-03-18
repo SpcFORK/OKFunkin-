@@ -301,6 +301,14 @@ fn ScrollableMenu(options, colors, w, di) {
   (scrollBar.children.0).color <- YELLOW
 
   {{
+    count: fn() count
+    ii: fn() ii
+    key: fn() OKey := optionKeys.(ii)
+    
+    getItem: fn() options.(OKey)
+
+    EListen: fn(cb) s('enter') |> onKeyPress(cb)
+  
     moveBack: fn moveBack(cb) if ii < count - 1 -> {
       ii <- ii + 1
     
@@ -761,9 +769,19 @@ with scene('gameSelect') fn {
 
   tabs := createMenuStructure()
 
-  tabs.top.topLeftText.text <- 'Select Tab'
-  tabs.top.topRightText.text <- 'USE ARROW KEYS TO MOVE TABS'
-  tabs.bottom.infoText.text <- '(Press ENTER to select tab)'
+  fn setText(topl, topr, infot) {
+    fn is(rule, cb) if rule != ? -> cb()
+    
+    with is(topl) fn() tabs.top.topLeftText.text <- topl
+    with is(topr) fn() tabs.top.topRightText.text <- topr
+    with is(infot) fn() tabs.bottom.infoText.text <- infot
+  }
+
+  setText(
+    'Select Tab'
+    'USE ARROW KEYS TO MOVE TABS'
+    '(Press ENTER to select tab)'
+  )
 
   // Yellowish BG
   with add() [
@@ -784,26 +802,60 @@ with scene('gameSelect') fn {
 
   // ---
 
-  sm := ScrollableMenu({
+  weeks := {
     'Story Mode': fn() go('storyMode')
     'Freeplay': fn() go('freeplay')
     'Options': fn() go('options')
     'Credits': fn() go('credits')
     'Quit': fn() console.log('quit')
-  })
+  }
+
+  weekKeys := keys(weeks)
+
+  sm := ScrollableMenu(weeks)
 
   // ---
 
+  fn changeTexts if sm.key() {
+    weekKeys.0 -> setText(
+      ?
+      'Play as Bean!'
+      'A unique storyline, Kaboom themed'
+    )
+
+    weekKeys.1 -> setText(
+      ?
+      'Play any SONG!'
+      'Your old friend, Freeplay.'
+    )
+
+    weekKeys.2 -> setText(
+      ?
+      'Play with your settings'
+      'Change how your game works'
+    )
+
+    weekKeys.3 -> setText(
+      ?
+      'See who did what'
+      'The credits, thank the ones in it!'
+    )
+
+    weekKeys.4 -> setText(
+      ?
+      'Quit'
+      'Quit the game, boooring.'
+    )
+  }
+
   fn moveLeft {
-    
     with sm.moveForward() fn() playTickSound()
-    
+    changeTexts()
   }
 
   fn moveRight {
-    
     with sm.moveBack() fn() playTickSound()
-    
+    changeTexts()
   }
 
   // ---
@@ -813,6 +865,13 @@ with scene('gameSelect') fn {
   
   s('right') |> with onKeyPressRepeat() moveRight
   s('d') |> with onKeyPressRepeat() moveRight
+
+  // ---
+
+  with sm.EListen() fn {
+    weekCall := sm.getItem()
+    weekCall()
+  }
   
 }
 
