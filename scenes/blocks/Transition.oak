@@ -17,19 +17,18 @@ fn Transition(color_, tw) {
 
   self.tr <- createFG()
 
-  fn makeTransition(speed, call, setOpacity) {
-    with self.tr.use() opacity(setOpacity)
-    with self.tr.use() call(speed)
+  fn fadeOut(sp) {
+    self.tr.fadeOut(sp)
   }
 
   self.fadeIn := fn(speed, color) {
     if color != ? -> self.tr.use(color)
-    makeTransition(speed, fadeIn, 0)
+    with self.tr.use() fadeIn(speed)
   }
 
   self.fadeOut := fn(speed, color) {
     if color != ? -> self.tr.use(color)
-    makeTransition(speed, fn(sp) self.tr.fadeOut(sp), 1)
+    self.tr.fadeOut(speed)
   }
 
   self
