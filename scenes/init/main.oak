@@ -1105,48 +1105,80 @@ with scene('storyMode') fn {
 
 with scene('freeplay') fn {
 
-  weeks := {
-    'Story Mode': fn() go('storyMode')
-    'Freeplay': fn() go('freeplay')
-    'Options': fn() go('options')
-    'Credits': fn() go('credits')
-    'Quit': fn() console.log('quit')
+  songs := {
+    'Song': fn() go('storyMode')
+    'Song2': fn() go('freeplay')
+    'Song3': fn() go('options')
   }
 
   // ---
 
-  weekKeys := keys(weeks)
+  songKeys := keys(songs)
 
-  sl := ScrollableList(weeks, ?, ?, 50)
+  sl := ScrollableList(songs, ?, ?, 50)
 
-  fn moveLeft {
+  fn moveUp {
     with sl.moveForward() fn() playTickSound()
   }
 
-  fn moveRight {
+  fn moveDown {
     with sl.moveBack() fn() playTickSound()
   }
 
   // ---
 
-  s('up') |> with onKeyPressRepeat() moveLeft
-  s('w') |> with onKeyPressRepeat() moveLeft
+  s('up') |> with onKeyPressRepeat() moveUp
+  s('w') |> with onKeyPressRepeat() moveUp
 
-  s('down') |> with onKeyPressRepeat() moveRight
-  s('s') |> with onKeyPressRepeat() moveRight
+  s('down') |> with onKeyPressRepeat() moveDown
+  s('s') |> with onKeyPressRepeat() moveDown
 
   // ---
 
   with sl.EListen() with std.once() fn {
-    weekCall := sl.getItem()
-
-    Transition(BLACK).fadeIn(0.2)
-    with wait(0.2) weekCall
+    songCall := sl.getItem()
+    songCall()
   }
 }
 
 with scene('options') fn {
-  
+
+  songs := {
+    'Graphics': fn() go('storyMode')
+    'Audio': fn() go('freeplay')
+    'Keybinds': fn() go('freeplay')
+    'Adv. Opts': fn() go('options')
+    'Leave': fn() console.log('quit')
+  }
+
+  // ---
+
+  songKeys := keys(songs)
+
+  sl := ScrollableList(songs, ?, ?, 50)
+
+  fn moveUp {
+    with sl.moveForward() fn() playTickSound()
+  }
+
+  fn moveDown {
+    with sl.moveBack() fn() playTickSound()
+  }
+
+  // ---
+
+  s('up') |> with onKeyPressRepeat() moveUp
+  s('w') |> with onKeyPressRepeat() moveUp
+
+  s('down') |> with onKeyPressRepeat() moveDown
+  s('s') |> with onKeyPressRepeat() moveDown
+
+  // ---
+
+  with sl.EListen() with std.once() fn {
+    songCall := sl.getItem()
+    songCall()
+  }
 }
 
 with scene('credits') fn {
