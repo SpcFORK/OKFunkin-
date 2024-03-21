@@ -364,6 +364,110 @@ fn ScrollableMenu(options, colors, w, di) {
   }}
 }
 
+fn ScrollableList(options, colors, y, di) {
+  colors := colors |> std.default([])
+  COL1 := colors.0 |> std.default(WHITE)
+  COL2 := colors.1 |> std.default(YELLOW)
+
+  HEIGHT := y |> std.default(300)
+  DIST := di |> std.default(30)
+
+  count := options |> len()
+  ii := 0
+
+  scrollBar := with add() [
+    pos(
+      20
+      center().y - (DIST + HEIGHT)
+    )
+  ]
+
+  scrollBar.TW := ?
+
+  optionKeys := keys(options)
+  with std.each(options) fn(ii, ic) {
+    with scrollBar.add() [
+      text(optionKeys.(ic), {
+        size: 36
+        color: WHITE
+        width: 500
+        font: s('gwibble')
+      })
+
+      pos(0, DIST + (DIST * ic) + (HEIGHT))
+    ]
+  }
+
+  // @ Text stuff
+  (scrollBar.children.0).color <- YELLOW
+
+  {{
+    count: fn() count
+    ii: fn() ii
+    key: OKey := fn() optionKeys.(ii)
+
+    getItem: fn() options.(OKey())
+
+    EListen: fn(cb) s('enter') |> onKeyPress(cb)
+
+    moveBack: fn moveBack(cb) if ii < count - 1 -> {
+      ii <- ii + 1
+
+      if scrollBar.TW != ? -> scrollBar.TW.finish()
+
+      scrollBar.TW <- tween(
+        scrollBar.pos.y
+        scrollBar.pos.y - DIST
+        0.2
+        fn(v) scrollBar.pos.y <- v
+        easings.easeOutQuad
+      )
+
+      textgo := scrollBar.children.(ii)
+
+      with std.each(scrollBar.children) fn(scrollChild, ic) {
+        if ic != ii -> scrollChild.color <- WHITE
+      }
+
+      textgo.color <- YELLOW
+
+      with scrollBar.TW.onEnd() fn {
+        scrollBar.TW <- ?
+      }
+
+      cb()
+    }
+
+    moveForward: fn moveForward(cb) if ii > 0 -> {
+      ii <- ii - 1
+
+      if scrollBar.TW != ? -> scrollBar.TW.finish()
+
+      scrollBar.TW <- tween(
+        scrollBar.pos.y
+        scrollBar.pos.y + DIST
+        0.2
+        fn(v) scrollBar.pos.y <- v
+        easings.easeOutQuad
+      )
+
+      textgo := scrollBar.children.(ii)
+
+      with std.each(scrollBar.children) fn(scrollChild, ic) {
+        if ic != ii -> scrollChild.color <- WHITE
+      }
+
+      textgo.color <- YELLOW
+
+      with scrollBar.TW.onEnd() fn {
+        scrollBar.TW <- ?
+      }
+
+      cb()
+    }
+  }}
+}
+
 // ---
 
 fn createBeatHandler {
@@ -1000,7 +1104,45 @@ with scene('storyMode') fn {
 }
 
 with scene('freeplay') fn {
-  
+
+  weeks := {
+    'Story Mode': fn() go('storyMode')
+    'Freeplay': fn() go('freeplay')
+    'Options': fn() go('options')
+    'Credits': fn() go('credits')
+    'Quit': fn() console.log('quit')
+  }
+
+  // ---
+
+  weekKeys := keys(weeks)
+
+  sl := ScrollableList(weeks, ?, ?, 50)
+
+  fn moveLeft {
+    with sl.moveForward() fn() playTickSound()
+  }
+
+  fn moveRight {
+    with sl.moveBack() fn() playTickSound()
+  }
+
+  // ---
+
+  s('up') |> with onKeyPressRepeat() moveLeft
+  s('w') |> with onKeyPressRepeat() moveLeft
+
+  s('down') |> with onKeyPressRepeat() moveRight
+  s('s') |> with onKeyPressRepeat() moveRight
+
+  // ---
+
+  with sl.EListen() with std.once() fn {
+    weekCall := sl.getItem()
+
+    Transition(BLACK).fadeIn(0.2)
+    with wait(0.2) weekCall
+  }
 }
 
 with scene('options') fn {
