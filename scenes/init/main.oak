@@ -1161,11 +1161,11 @@ with scene('options') fn {
   // ---
 
   songs := {
-    'Graphics': fn() go('storyMode')
-    'Audio': fn() go('freeplay')
-    'Keybinds': fn() go('freeplay')
-    'Adv. Opts': fn() go('options')
-    'Leave': fn() console.log('quit')
+    'Graphics': fn() go('op_graphics')
+    'Audio': fn() go('op_audio')
+    'Keybinds': fn() go('op_kb')
+    'Adv. Opts': fn() go('op_adv')
+    'Leave': fn() go('gameSelect')
   }
 
   // ---
@@ -1196,6 +1196,22 @@ with scene('options') fn {
     songCall := sl.getItem()
     songCall()
   }
+}
+
+with scene('op_graphics') fn {
+
+}
+
+with scene('op_audio') fn {
+
+}
+
+with scene('op_kb') fn {
+
+}
+
+with scene('op_adv') fn {
+
 }
 
 with scene('credits') fn {
