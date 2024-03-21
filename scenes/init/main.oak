@@ -831,8 +831,8 @@ with scene('menuScreen') fn {
 
   text_ := with add() [
     text('Press Enter to Start!' |> s(), {
-      size: 28
-      font: gwibble
+      size: 16
+      font: s('sink')
       align: 'center' |> s()
     })
     
