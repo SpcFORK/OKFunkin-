@@ -868,6 +868,10 @@ with scene('menuScreen') fn {
 
 with scene('gameSelect') fn {
 
+  enterNextH('menuScreen', 'escape')
+
+  // ---
+
   tabs := createMenuStructure()
 
   fn setText(topl, topr, infot) {
@@ -983,6 +987,11 @@ with scene('gameSelect') fn {
 // ---
 
 with scene('storyMode') fn {
+
+  enterNextH('gameSelect', 'escape')
+
+  // ---
+
   tabs := createMenuStructure()
 
   fn setText(topl, topr, infot) {
@@ -1105,6 +1114,10 @@ with scene('storyMode') fn {
 
 with scene('freeplay') fn {
 
+  enterNextH('gameSelect', 'escape')
+  
+  // ---
+
   songs := {
     'Song': fn() go('storyMode')
     'Song2': fn() go('freeplay')
@@ -1142,6 +1155,10 @@ with scene('freeplay') fn {
 }
 
 with scene('options') fn {
+
+  enterNextH('gameSelect', 'escape')
+
+  // ---
 
   songs := {
     'Graphics': fn() go('storyMode')
@@ -1182,6 +1199,11 @@ with scene('options') fn {
 }
 
 with scene('credits') fn {
+
+  enterNextH('gameSelect', 'escape')
+
+  // ---
+
   
 }
 
