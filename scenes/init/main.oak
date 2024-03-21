@@ -1154,6 +1154,8 @@ with scene('freeplay') fn {
   }
 }
 
+// ---
+
 with scene('options') fn {
 
   enterNextH('gameSelect', 'escape')
@@ -1200,18 +1202,172 @@ with scene('options') fn {
 
 with scene('op_graphics') fn {
 
+  enterNextH('options', 'escape')
+
+  // ---
+
+  options := {
+    'Gamma': fn() go('op_graphics')
+    'Zoom': fn() go('op_kb')
+    'No Shaders': fn() go('op_audio')
+    'Leave': fn() go('options')
+  }
+
+  // ---
+
+  optionKeys := keys(options)
+
+  sl := ScrollableList(options, ?, ?, 50)
+
+  fn moveUp {
+    with sl.moveForward() fn() playTickSound()
+  }
+
+  fn moveDown {
+    with sl.moveBack() fn() playTickSound()
+  }
+
+  // ---
+
+  s('up') |> with onKeyPressRepeat() moveUp
+  s('w') |> with onKeyPressRepeat() moveUp
+
+  s('down') |> with onKeyPressRepeat() moveDown
+  s('s') |> with onKeyPressRepeat() moveDown
+
+  // ---
+
+  with sl.EListen() with std.once() fn {
+    optionCall := sl.getItem()
+    optionCall()
+  }
 }
 
 with scene('op_audio') fn {
 
+  enterNextH('options', 'escape')
+
+  // ---
+
+  options := {
+    'All': fn() go('op_audio')
+    'Music': fn() go('op_graphics')
+    'Vocals': fn() go('op_kb')
+    'Sounds': fn() go('op_adv')
+    'Leave': fn() go('options')
+  }
+
+  // ---
+
+  optionKeys := keys(options)
+
+  sl := ScrollableList(options, ?, ?, 50)
+
+  fn moveUp {
+    with sl.moveForward() fn() playTickSound()
+  }
+
+  fn moveDown {
+    with sl.moveBack() fn() playTickSound()
+  }
+
+  // ---
+
+  s('up') |> with onKeyPressRepeat() moveUp
+  s('w') |> with onKeyPressRepeat() moveUp
+
+  s('down') |> with onKeyPressRepeat() moveDown
+  s('s') |> with onKeyPressRepeat() moveDown
+
+  // ---
+
+  with sl.EListen() with std.once() fn {
+    optionCall := sl.getItem()
+    optionCall()
+  }
 }
 
 with scene('op_kb') fn {
 
+  enterNextH('options', 'escape')
+
+  // ---
+
+  options := {
+    'Game': fn() go('op_graphics')
+    'Menu': fn() go('op_audio')
+    'Mods': fn() go('op_kb')
+    'Leave': fn() go('options')
+  }
+
+  // ---
+
+  optionKeys := keys(options)
+
+  sl := ScrollableList(options, ?, ?, 50)
+
+  fn moveUp {
+    with sl.moveForward() fn() playTickSound()
+  }
+
+  fn moveDown {
+    with sl.moveBack() fn() playTickSound()
+  }
+
+  // ---
+
+  s('up') |> with onKeyPressRepeat() moveUp
+  s('w') |> with onKeyPressRepeat() moveUp
+
+  s('down') |> with onKeyPressRepeat() moveDown
+  s('s') |> with onKeyPressRepeat() moveDown
+
+  // ---
+
+  with sl.EListen() with std.once() fn {
+    optionCall := sl.getItem()
+    optionCall()
+  }
 }
 
 with scene('op_adv') fn {
 
+  enterNextH('options', 'escape')
+
+  // ---
+
+  options := {
+    'Leave': fn() go('options')
+  }
+
+  // ---
+
+  optionKeys := keys(options)
+
+  sl := ScrollableList(options, ?, ?, 50)
+
+  fn moveUp {
+    with sl.moveForward() fn() playTickSound()
+  }
+
+  fn moveDown {
+    with sl.moveBack() fn() playTickSound()
+  }
+
+  // ---
+
+  s('up') |> with onKeyPressRepeat() moveUp
+  s('w') |> with onKeyPressRepeat() moveUp
+
+  s('down') |> with onKeyPressRepeat() moveDown
+  s('s') |> with onKeyPressRepeat() moveDown
+
+  // ---
+
+  with sl.EListen() with std.once() fn {
+    optionCall := sl.getItem()
+    optionCall()
+  }
 }
 
 with scene('credits') fn {
@@ -1220,7 +1376,20 @@ with scene('credits') fn {
 
   // ---
 
-  
+  creditStr := 
+    'SpectCOW (SpcFORK), Creator of KaboomFunkin.\n' <<
+    'Thanks for playing!'
+
+  with add() [
+    text(creditStr, {
+      size: 12 * 1.5
+      align: s('center')
+    })
+
+    with pos() center()
+    with anchor() s('center')
+  ]
+
 }
 
 // ---
