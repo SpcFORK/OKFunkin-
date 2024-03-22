@@ -1207,9 +1207,9 @@ with scene('op_graphics') fn {
   // ---
 
   options := {
-    'Gamma': fn() go('op_graphics')
-    'Zoom': fn() go('op_kb')
-    'No Shaders': fn() go('op_audio')
+    'Gamma': fn() go('op_graphics_gamma')
+    'Zoom': fn() go('op_graphics_zoom')
+    'No Shaders': fn() go('op_graphics_shaders')
     'Leave': fn() go('options')
   }
 
@@ -1250,10 +1250,10 @@ with scene('op_audio') fn {
   // ---
 
   options := {
-    'All': fn() go('op_audio')
-    'Music': fn() go('op_graphics')
-    'Vocals': fn() go('op_kb')
-    'Sounds': fn() go('op_adv')
+    'All': fn() go('op_audio_all')
+    'Music': fn() go('op_audio_msc')
+    'Vocals': fn() go('op_audio_vcl')
+    'Sounds': fn() go('op_audio_snd')
     'Leave': fn() go('options')
   }
 
@@ -1294,9 +1294,9 @@ with scene('op_kb') fn {
   // ---
 
   options := {
-    'Game': fn() go('op_graphics')
-    'Menu': fn() go('op_audio')
-    'Mods': fn() go('op_kb')
+    'Game': fn() go('op_kb_g')
+    'Menu': fn() go('op_kb_m')
+    'Mods': fn() go('op_kb_c')
     'Leave': fn() go('options')
   }
 
