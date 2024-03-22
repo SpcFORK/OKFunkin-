@@ -43,7 +43,7 @@ fi_ := getFInput()
 
 // ---
 
-fn enterNextH(sce, key?) {
+fn enterNextH(sce, key?, cb) {
   key? <- key? |> std.default('enter')
 
   switched? := false
@@ -53,7 +53,10 @@ fn enterNextH(sce, key?) {
       nextPress.cancel()
       
       Transition(BLACK).fadeIn(0.2)
-      with wait(0.2) fn() go(sce)
+      with wait(0.2) fn {
+        go(sce)
+        if cb != ? -> cb()
+      }
     }
   }
 
@@ -798,7 +801,9 @@ with scene('intro') fn {
 with scene('menuScreen') fn {
 
   enterNextH('gameSelect')
-  enterNextH('intro', 'escape')
+  with enterNextH('intro', 'escape') fn {
+    stopMenuMusic()
+  }
 
   // ---
 
