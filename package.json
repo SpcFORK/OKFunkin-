@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "oak nat/.main.oak",
-    "build": "oak nat/.build.oak"
+    "build": "oak nat/.build.oak",
     "serve": "oak nat/.serve.oak"
   },
   "keywords": [],
