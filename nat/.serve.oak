@@ -1,0 +1,192 @@
+std := import('std')
+str := import('str')
+fmt := import('fmt')
+fs := import('fs')
+path := import('path')
+http := import('http')
+
+server := http.Server()
+
+// ---
+
+fn makeOrGetDir(dir) {
+  ndir := path.resolve(dir)
+
+  if result := stat(ndir) {
+    { data: _ } -> [ndir, result]
+    _ -> mkdir(ndir)
+  }
+}
+
+fn makeOrGetFile(dir, default) {
+  ndir := path.resolve(dir)
+  def := default |> std.default('')
+
+  if fs.statFile(ndir) {
+    { len: 0 }, ? -> {
+      fs.writeFile(ndir, def)
+
+      def
+    }
+
+    { _ } -> fs.readFile(ndir)
+  }
+}
+
+fn getLastPath(path...) {
+  splitPath := http.split(path...)
+  splitPath.(len(splitPath) - 1)
+}
+
+fn _getSuffix(path) {
+  parts := path |> str.split('.')
+  parts.(len(parts) - 1)
+}
+
+fn suffix?(path...) {
+  splitEnding := getLastPath(path)
+  _getSuffix(splitEnding)
+}
+
+fn looseMimeForPath(path...) {
+  getPathFileName
+  http.MimeTypes.(ending)
+}
+
+fn import?(mod) {
+  p_ := mod + '.oak'
+  stats := fs.statFile(p_)
+
+  if stats != ? -> import(mod)
+}
+
+// ---
+
+webDir := path.resolve('web')
+buildDir := path.resolve('build')
+
+File := path.resolve('entry', webDir)
+bFile := path.resolve('entry', buildDir)
+
+fO_ := File + '.oak'
+bJS := bFile + '.js'
+mbJS := bFile + '.m.js'
+
+archivebOak := bFile + '.oak'
+binFile := bFile |> string()
+
+head := File + '.header.js'
+foot := File + '.footer.js'
+
+makeOrGetDir(webDir)
+makeOrGetDir(buildDir)
+
+fn handleFrame(mod, frame) {
+  imported := import?(mod)
+  k := imported |> keys()
+
+  obj := {
+    server: server
+    webDir: webDir
+    buildDir: buildDir
+  }
+
+  if imported != ? & k |> std.contains?(frame) {
+    true -> imported.(frame)(obj)
+
+    false -> std.println('No ' << frame << ' for ' << mod)
+  }
+}
+
+fn frameFactory(mod) fn(frame) handleFrame(mod, frame)
+
+// ---
+
+gotFile := fs.readFile(bJS)
+
+fn resolveHTMLBuilding(build) {
+  '
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/kaboom/dist/kaboom.js"></script>
+  <title>
+    OKFunk
+  </title>
+
+  <meta name="description" content="An Oak + Kaboom mix of a bunch of cool stuff in the shape of a Dedicated Funkin clone.">
+
+  <!-- Facebook Meta Tags -->
+  <meta property="og:url" content="https://okfunk.replit.app/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="OKFunk">
+  <meta property="og:description" content="An Oak + Kaboom mix of a bunch of cool stuff in the shape of a Dedicated Funkin clone.">
+  <meta property="og:image" content="Okin.png">
+
+  <!-- Twitter Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="twitter:domain" content="okfunk.replit.app">
+  <meta property="twitter:url" content="https://okfunk.replit.app/">
+  <meta name="twitter:title" content="OKFunk">
+  <meta name="twitter:description" content="An Oak + Kaboom mix of a bunch of cool stuff in the shape of a Dedicated Funkin clone.">
+  <meta name="twitter:image" content="Okin.png">
+
+</head>
+<body>
+  <script src="JS/exports.js" type="module"></script>
+  <script>{{ 0 }}</script>
+</body>
+</html>
+  ' |> str.trim() |> fmt.format(build)
+}
+
+// ---
+
+with server.route('/*Path') fn(params) {
+  http.handleStatic(params.Path)
+}
+
+with server.route('/') fn(params) {
+  fn(req, end) if req.method {
+    'GET' -> end({
+      status: 200
+      headers: { 'Content-Type': http.MimeTypes.html }
+      body: resolveHTMLBuilding(gotFile)
+    })
+    _ -> end(http.MethodNotAllowed)
+  }
+}
+
+// ---
+
+std.println('FilePath: ', path.resolve('nat/entry.oak'))
+
+// ---
+
+ff := path.resolve('nat/entry') |> frameFactory()
+
+// ---
+
+res := exec('node', [
+  path.resolve('index.js')
+], '')
+
+res <- if res |> type() {
+  :string -> res
+  _ -> res.stdout
+}
+
+std.print(
+  '\n\n[ OAKSri ]\n' << res |> string()
+)
+
+// ---
+
+ff('BeforeServer')
+
+server.start(9999)
+
+ff('AfterServer')
