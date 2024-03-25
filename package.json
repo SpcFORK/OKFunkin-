@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "oak nat/.main.oak"
+    "dev": "oak nat/.main.oak",
+    "build": "oak nat/.build.oak"
   },
   "keywords": [],
   "author": "",

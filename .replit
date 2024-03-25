@@ -3,7 +3,8 @@ language = "kaboom"
 onBoot = "chmod +x .config/bin/oak"
 
 entrypoint = "web/entry.oak"
-run = "oak nat/.main.oak"
+# run = "oak nat/.main.oak"
+run = "npm run dev"
 modules = ["nodejs-20:v8-20230920-bd784b9"]
 
 [nix]

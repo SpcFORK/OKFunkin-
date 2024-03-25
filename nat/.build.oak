@@ -1,0 +1,137 @@
+std := import('std')
+str := import('str')
+fmt := import('fmt')
+fs := import('fs')
+path := import('path')
+http := import('http')
+
+server := http.Server()
+
+// ---
+
+fn makeOrGetDir(dir) {
+  ndir := path.resolve(dir)
+
+  if result := stat(ndir) {
+    { data: _ } -> [ndir, result]
+    _ -> mkdir(ndir)
+  }
+}
+
+fn makeOrGetFile(dir, default) {
+  ndir := path.resolve(dir)
+  def := default |> std.default('')
+
+  if fs.statFile(ndir) {
+    { len: 0 }, ? -> {
+      fs.writeFile(ndir, def)
+
+      def
+    }
+
+    { _ } -> fs.readFile(ndir)
+  }
+}
+
+fn getLastPath(path...) {
+  splitPath := http.split(path...)
+  splitPath.(len(splitPath) - 1)
+}
+
+fn _getSuffix(path) {
+  parts := path |> str.split('.')
+  parts.(len(parts) - 1)
+}
+
+fn suffix?(path...) {
+  splitEnding := getLastPath(path)
+  _getSuffix(splitEnding)
+}
+
+fn looseMimeForPath(path...) {
+  getPathFileName
+  http.MimeTypes.(ending)
+}
+
+fn import?(mod) {
+  p_ := mod + '.oak'
+  stats := fs.statFile(p_)
+
+  if stats != ? -> import(mod)
+}
+
+// ---
+
+webDir := path.resolve('web')
+buildDir := path.resolve('build')
+
+File := path.resolve('entry', webDir)
+bFile := path.resolve('entry', buildDir)
+
+fO_ := File + '.oak'
+bJS := bFile + '.js'
+mbJS := bFile + '.m.js'
+
+archivebOak := bFile + '.oak'
+binFile := bFile |> string()
+
+head := File + '.header.js'
+foot := File + '.footer.js'
+
+makeOrGetDir(webDir)
+makeOrGetDir(buildDir)
+
+// ---
+
+std.print(
+  '\n[ OAKSri ]\n' << exec('oak', [
+    'build'
+
+    '--entry'
+    fO_
+
+    '--output'
+    bJS
+
+    '--web'
+  ], '').stdout << '\n'
+)
+
+std.print(
+  '\n[ OAKSri ]\n' << exec('oak', [
+    'build'
+
+    '--entry'
+    fO_
+
+    '--output'
+    archivebOak
+  ], '').stdout << '\n'
+)
+
+std.print(
+  '\n[ OAKSri ]\n' << exec('oak', [
+    path.resolve('nat/.pack.oak')
+
+    '--entry'
+    fO_
+
+    '--output'
+    binFile
+  ], '').stdout << '\n'
+)
+
+gotFile := with makeOrGetFile(bJS) ''
+gotHeader := with makeOrGetFile(head) ''
+gotFooter := with makeOrGetFile(foot) ''
+
+bJS |> fs.writeFile(gotHeader + '\n\n' + gotFile + '\n\n' + gotFooter) |> std.println()
+
+std.print(
+  '\n[ OAKSri ]\n' << exec('uglifyjs', [
+    bJS
+
+    '--output'
+    mbJS
+  ], '').stdout << '\n'
+)
