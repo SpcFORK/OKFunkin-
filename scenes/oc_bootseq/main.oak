@@ -31,7 +31,8 @@ with scene('boot__') fn {
     opacity(0)
   ])
 
-  fn setOpac(opac) logo_.opacity <- opac
+  CANCELLED? := false
+  fn setOpac(opac) if ! CANCELLED? -> logo_.opacity <- opac
 
   // ---
 
@@ -45,7 +46,7 @@ with scene('boot__') fn {
     [0.05, 0.7]
     [0.05, 0.9]
     [0.05, 1]
-  ] |> with cutsc_scale.Cutscene() fn(i) logo_.scale <- i
+  ] |> with cutsc_scale.Cutscene() fn(i) if ! CANCELLED? -> logo_.scale <- i
   
   // time | opac
   cutsc.sh.step(2)
@@ -66,5 +67,9 @@ with scene('boot__') fn {
     [2 + 2, fn() go('init')]
     
   ] |> cutsc.Cutscene(setOpac)
-  
+
+  with onKeyPress(s('enter')) fn if ! CANCELLED? -> {
+    CANCELLED? <- true
+    go('init')
+  }
 }

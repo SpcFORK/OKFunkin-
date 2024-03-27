@@ -11,6 +11,7 @@ oaka := import('oaka')
 globalThis.k := kaboom({
   width: 600
   height: 500
+  scale: 1.25
 })
 
 vv := visualViewport
@@ -40,6 +41,7 @@ fn updateCanvas {
   canvas.style.border <- '1px solid rgba(248, 206, 86, 0.25)'
   canvas.style.borderRadius <- '8px'
   canvas.style.padding <- '8px'
+
 }
 
 updateCanvas()

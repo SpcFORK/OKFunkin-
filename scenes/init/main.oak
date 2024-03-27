@@ -23,11 +23,13 @@ ksink := loadFont(
 // W GLOBALS
 
 // Check if we can play Sounds
-FirstInput? := false
-IS_IFRAME := (window.location != window.parent.location)
-CHROMEOS := navigator.userAgent.includes('CrOS')
-
-SUPERCOMMONCOLOUR := [248, 206, 86]
+{
+  FirstInput?: FirstInput?
+  IS_IFRAME: IS_IFRAME
+  CHROMEOS: CHROMEOS
+  
+  SUPERCOMMONCOLOUR: SUPERCOMMONCOLOUR
+} := import('core')
 
 // ---
 
@@ -106,18 +108,22 @@ GLOBAL_LOADED_FILES := window.GLOBAL_LOADED_FILES := {
 
 // @Preload
 
-gwibble := ?
-beanSpr := ?
-ghostySpr := ?
-menu_logoSpr := ?
-loadBarSpr := ?
-loading_tempSpr := ?
-kaboomSpr := ?
-kaboom_bgSpr := ?
-cowingSpr := ?
-introTexts := ?
+PRELOAD := import('menu/preload')
 
-menuMusic := ?
+{
+  gwibble: gwibble
+  beanSpr: beanSpr
+  ghostySpr: ghostySpr
+  menu_logoSpr: menu_logoSpr
+  loadBarSpr: loadBarSpr
+  loading_tempSpr: loading_tempSpr
+  kaboomSpr: kaboomSpr
+  kaboom_bgSpr: kaboom_bgSpr
+  cowingSpr: cowingSpr
+  introTexts: introTexts
+
+  menuMusic: menuMusic
+} := PRELOAD
 
 // ---
 
@@ -495,183 +501,7 @@ fn createBeatHandler {
 
 // ---
 
-FLAGS? := {
-  init?: false
-}
 
-// ---
-
-with scene('initLoading') fn {
-
-  setBackground(BLACK)
-
-  FONT_SIZE := 24
-
-  loader_text := with add() [
-    text(
-      ''
-      {
-        font: 'gwibble' |> s()
-        size: FONT_SIZE
-      }
-    )
-    pos()
-    with anchor() 'topleft' |> s()
-  ]
-
-  fn AddText(text) {
-    loader_text.text <- loader_text.text + text |> s() << '\n'
-  }
-
-  // ---
-
-  AddText('Welcome to OKFunk!!!')
-  AddText('')
-  
-  fn log(ii) AddText('[okbf] ' << ii)
-  fn attemptLog(ii) with log() 'Attempting to load: ' << ii
-  fn sucLog(ii) with log() 'Got: ' << ii
-
-  // ---
-
-  // @ Asset Loading
-  attemptLog('gwibble')
-  
-  gwibble := loadFont(
-    'gwibble' |> s()
-    '/fonts/gwibble/font.ttf' |> s()
-  )
-
-  with AddText() gwibble |> keys()
-  AddText('')
-  
-  sucLog('gwibble')
-
-  attemptLog('bean')
-  beanSpr <- with do() '
-    loadSpriteAtlas("sprites/game/characters/beanfriend.png", {
-      bean: {
-        x: 0,
-        y: 0,
-        width: 96 * 5,
-        height: 76 * 5,
-        sliceX: 5,
-        sliceY: 5,
-        anims: {
-          none: { from: 0, to: 0, loop: true, },
-          idle: { from: 0, to: 4, loop: true },
-          left: { from: 5, to: 8, loop: false },
-          down: { from: 9, to: 12, loop: false },
-          up: { from: 13, to: 16, loop: false },
-          right: { from: 17, to: 20, loop: false },
-        },
-      }
-    })
-  '
-  
-  with AddText() beanSpr |> keys()
-  AddText('')
-  
-  sucLog('bean')
-
-  attemptLog('ghosty')
-  ghostySpr <- with do() '
-    loadSpriteAtlas("sprites/game/characters/Ghosty.png", {
-      ghosty: {
-        x: 0,
-        y: 0,
-        width: 72 * 2,
-        height: 80 * 2,
-        sliceX: 2,
-        anims: {
-          none: { from: 0, to: 0, loop: true, },
-          idle: { from: 0, to: 1, loop: true },
-        }
-      }
-    })
-  '
-
-  with AddText() ghostySpr |> keys()
-  AddText('')
-  
-  sucLog('ghosty')
-
-  fn lspr(name, path) {
-    id := 'sprite:' << name
-    
-    attemptLog(id)
-    
-    returns := OKloadSprite(name, path)
-    
-    with AddText() returns |> keys()
-    AddText('')
-    sucLog(id)
-
-    returns
-  }
-  
-  fn lsnd(name, path) {
-    id := 'sound:' << name
-    
-    attemptLog(id)
-    
-    returns := loadSound(
-      s(name)
-      s(path)
-    )
-    
-    with AddText() returns |> keys()
-    AddText('')
-    sucLog(id)
-
-    returns
-  }
-  
-  menu_logoSpr <- lspr('menu_logo', 'sprites/menu/menu.png')
-  loadBarSpr <- lspr('loadBar', 'sprites/loadBar.png')
-  loading_tempSpr <- lspr('loading_temp', 'sprites/menu/kblfront.png')
-
-  kaboomSpr <- lspr('kaboom', 'sprites/ka.png')
-
-  kaboom_bgSpr := lspr(
-    'kaboom_bg'
-    'sprites/boom.png'
-  )
-
-  cowingSpr <- lspr('cowing', '/cowingWhite.png')
-
-  lsnd('freakyMenu', 'sounds/freakyMenu.ogg')
-  
-  lsnd('confirmMenu', 'sounds/confirmMenu.ogg')
-  lsnd('cancelMenu', 'sounds/cancelMenu.ogg')
-  lsnd('scrollMenu', 'sounds/scrollMenu.ogg')
-
-  // Modders !
-  window.intialLoad <- {
-    gwibble: gwibble
-    beanSpr: beanSpr
-    ghostySpr: ghostySpr
-    menu_logoSpr: menu_logoSpr
-    loadBarSpr: loadBarSpr
-    loading_tempSpr: loading_tempSpr
-    kaboomSpr: kaboomSpr
-    kaboom_bgSpr: kaboom_bgSpr
-  }
-
-  with load() Promise.all([
-    fetch('code/txt.txt').
-      then(fn(res) res.text()).
-      then(fn(res) introTexts <- string(res))
-  ])
-
-  // ---
-
-  // @ First Input check
-  go('inputCheck', {
-    next: fn() go('intro')
-  })
-
-}
 
 // ---
 
@@ -1398,6 +1228,10 @@ with scene('credits') fn {
 }
 
 // ---
+
+FLAGS? := {
+  init?: false
+}
 
 with scene('game') fn {
   if ! FLAGS?.init? {

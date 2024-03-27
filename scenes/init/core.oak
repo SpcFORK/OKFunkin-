@@ -1,0 +1,6 @@
+// Check if we can play Sounds
+FirstInput? := false
+IS_IFRAME := (window.location != window.parent.location)
+CHROMEOS := navigator.userAgent.includes('CrOS')
+
+SUPERCOMMONCOLOUR := [248, 206, 86]
