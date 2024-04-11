@@ -1,7 +1,10 @@
 .config/bin/oak
 /build
 /node_modules
+/JS
 node_modules/
 build/
+JS/
 node_modules
 build
+JS
