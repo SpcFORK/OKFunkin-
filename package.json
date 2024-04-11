@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "cd ./src && npx webpack && cd .. && node ./JS/exports.js test",
     "dev": "cd ./src && npx webpack && cd .. && oak nat/.main.oak",
     "build": "cd ./src && npx webpack && cd .. && oak nat/.build.oak",
     "serve": "cd ./src && npx webpack && cd .. && oak nat/.serve.oak",

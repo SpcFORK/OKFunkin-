@@ -1,5 +1,7 @@
 import k from "./kaboom";
 import g from "./global";
+import * as plat from "./whatPlatform";
+import tests from "./tests/tests";
 
 let print = (message?: any, ...optionalParams: any[]) => {
   console.log(message, optionalParams);
@@ -12,3 +14,12 @@ let printHello = () => {
 
 g.print = print;
 g.printHello = printHello;
+
+if (plat.isBrowser) {
+  // Run Browser Things Here
+  console.log("OKF GlobalImport Working!");
+}
+if (plat.isNode) {
+  // Run Node Things Here
+  tests();
+}
