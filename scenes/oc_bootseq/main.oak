@@ -2,8 +2,6 @@
   Transition: Transition
 } := import('../blocks/Transition')
 
-notes := import('../notes/main')
-
 std := import('std')
 
 // ---
