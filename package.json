@@ -4,10 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "oak nat/.main.oak",
-    "build": "oak nat/.build.oak",
-    "serve": "oak nat/.serve.oak"
+    "test": "cd ./src && npx webpack && cd .. && node ./JS/exports.js test",
+    "dev": "cd ./src && npx webpack && cd .. && oak nat/.main.oak",
+    "build": "cd ./src && npx webpack && cd .. && oak nat/.build.oak",
+    "serve": "cd ./src && npx webpack && cd .. && oak nat/.serve.oak",
+    "ts-compile": "cd ./src && npx webpack && cd .."
   },
   "keywords": [],
   "author": "",
@@ -16,6 +17,11 @@
     "@types/node": "^18.0.6",
     "kaboom": "^3000.1.17",
     "node-fetch": "^3.2.6",
-    "uglify-js": "^3.17.4"
+    "ts-loader": "^9.5.1",
+    "tsc": "^2.0.4",
+    "typescript": "^5.4.5",
+    "uglify-js": "^3.17.4",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4"
   }
 }
