@@ -18,74 +18,6 @@ ksink := loadFont(
   s('/fonts/sink/font.ttf')
 )
 
-// ---
-
-// W GLOBALS
-
-// Check if we can play Sounds
-{
-  FirstInput?: FirstInput?
-  IS_IFRAME: IS_IFRAME
-  CHROMEOS: CHROMEOS
-  
-  SUPERCOMMONCOLOUR: SUPERCOMMONCOLOUR
-} := import('core')
-
-// ---
-
-fn getFInput(cb) {
-  holder := with onClick() fn {
-    FirstInput? <- true
-    holder.cancel()
-    
-    if cb != ? -> cb()
-  }
-}
-fi_ := getFInput()
-
-// ---
-
-fn enterNextH(sce, key?, cb) {
-  key? <- key? |> std.default('enter')
-
-  switched? := false
-
-  nextPress := with onKeyPress(key? |> s()) with std.once() fn {
-    if !switched? -> {
-      nextPress.cancel()
-      
-      Transition(BLACK).fadeIn(0.2)
-      with wait(0.2) fn {
-        go(sce)
-        if cb != ? -> cb()
-      }
-    }
-  }
-
-  {{
-    allow: fn() switched? <- false
-    deny: fn() switched? <- true
-  }}
-}
-
-fn playMenuEnter {
-  s('confirmMenu') |> play({
-    volume: 0.5
-  })
-}
-
-fn MEnterTrigger {
-  // @ Sounds
-  DONE_ENTER_SOUND := false
-  with onKeyPress('enter' |> s()) fn if !DONE_ENTER_SOUND -> {
-    DONE_ENTER_SOUND := true
-
-    playMenuEnter()
-  }
-}
-
-// ---
-
 GLOBAL_LOADED_FILES := window.GLOBAL_LOADED_FILES := {
   txts: ''
   RIGHTTOPTEXTCHOICES: {}
@@ -93,6 +25,43 @@ GLOBAL_LOADED_FILES := window.GLOBAL_LOADED_FILES := {
   WEEKSONGS: {}
   STORYW: {}
 }
+
+// ---
+
+// W GLOBALS
+// Check if we can play Sounds
+{
+  FirstInput?: FirstInput?
+  IS_IFRAME: IS_IFRAME
+  CHROMEOS: CHROMEOS
+  
+  SUPERCOMMONCOLOUR: SUPERCOMMONCOLOUR
+
+  getFInput: getFInput
+  enterNextH: enterNextH
+
+  playMenuEnter: playMenuEnter
+  MEnterTrigger: MEnterTrigger
+
+  currentAudio: currentAudio
+  
+  playMenuEnter: playMenuEnter
+  stopConfirm: stopConfirm
+  MEnterTrigger: MEnterTrigger
+  
+  playMenuMusic: playMenuMusic
+  stopMenuMusic: stopMenuMusic
+
+  playTickSound: playTickSound
+  stopTickSound: stopTickSound
+
+  createPlayer: createPlayer
+  createGhosty: createGhosty
+
+  createMenuStructure: createMenuStructure
+  ScrollableMenu: ScrollableMenu
+  ScrollableList: ScrollableList
+} := import('core')
 
 // ---
 
@@ -127,358 +96,6 @@ PRELOAD := import('menu/preload')
 
 // ---
 
-currentAudio := {
-  freakyMenu: ?
-  scrollMenu: ?
-}
-
-// ---
-
-fn playMenuMusic {
-  currentAudio.freakyMenu <- play(
-    'freakyMenu' |> s()
-    {
-      volume: 0.5,
-      loop: true,
-    }
-  )
-}
-
-fn stopMenuMusic() if currentAudio.freakyMenu != ? -> {
-  currentAudio.freakyMenu.stop()
-}
-
-fn playTickSound {
-  currentAudio.scrollMenu <-  play(
-    s('scrollMenu')
-    {
-      volume: 0.5
-    }
-  )
-}
-
-fn stopTickSound() if currentAudio.scrollMenu != ? -> {
-  currentAudio.scrollMenu.stop()
-}
-
-// ---
-
-fn createPlayer() {
-  with add() [
-    sprite(s('bean'), {
-      anim: 'idle' |> s()
-    })
-    pos(center())
-    area()
-    body()
-    with anchor() 'center' |> s()
-    {
-      score: 0
-      misses: 0
-      combo: 0
-      combo_max: 0
-      health: 100
-    }
-  ]
-}
-
-fn createGhosty() {
-  with add() [
-    sprite(
-      s('ghosty')
-      {
-        anim: s('idle')
-        animSpeed: 0.5
-      }
-    )
-    with anchor() 'center' |> s()
-    pos(center())
-  ]
-}
-
-// ---
-
-fn createMenuStructure {
-  INFOTEXTCHOICES := {
-    'story mode': 'Story Mode - Play the storyline!'
-    'freeplay': 'Freeplay - Play any song!'
-    'options': 'Options - Change your settings!'
-    'quit': 'Quit - Exit the game!'
-  }
-
-  top := {}
-
-  top.bar <- with add() [
-    rect(width(), 40)
-    pos(0, 0)
-    color(0, 0, 0)
-    z(- 2)
-  ]
-
-  top.topLeftText <- with add() [
-    s('Top Left') |> text({
-      size: 18
-      font: s('sink')
-    })
-    pos(5, 5)
-    with anchor() s('topleft')
-    z(-2)
-  ]
-
-  top.topRightText <- with add() [
-    s('Top Right') |> text({
-      size: 18
-      font: s('sink')
-    })
-    pos(width() - 5, 5)
-    with anchor() s('topright')
-    z(-2)
-  ]
-
-  // ---
-
-  bottom := {}
-
-  bottom.bar <- with add() [
-    rect(width(), 200)
-    pos(0, height())
-    color(0, 0, 0)
-    z(-2)
-    with anchor() s('botleft')
-  ]
-
-  bottom.infoText <- with add() [
-    s('Loading...') |> text({
-      size: 18
-      font: s('sink')
-    })
-    pos(5, height() - 5)
-    with anchor() s('botleft')
-    z(-2)
-  ]
-
-  // ---
-
-  {{
-    top: top
-    bottom: bottom
-  }}
-}
-
-// ---
-
-fn ScrollableMenu(options, colors, w, di) {
-
-  colors := colors |> std.default([])
-  COL1 := colors.0 |> std.default(WHITE)
-  COL2 := colors.1 |> std.default(YELLOW)
-
-  WIDTH := w |> std.default(300)
-  DIST := di |> std.default(30)
-
-  count := options |> len()
-  ii := 0
-
-  scrollBar := with add() [
-    pos(
-      center().x - (DIST + WIDTH)
-      center().y + 65
-    )
-  ]
-
-  scrollBar.TW := ?
-
-  optionKeys := keys(options)
-  with std.each(options) fn(ii, ic) {
-    with scrollBar.add() [
-      text(optionKeys.(ic), {
-        align: s('center')
-        size: 36
-        color: WHITE
-        width: WIDTH
-        font: s('gwibble')
-      })
-
-      pos(DIST + (WIDTH * ic) + (WIDTH / 2), 0)
-    ]
-  }
-
-  // @ Text stuff
-  (scrollBar.children.0).color <- YELLOW
-
-  {{
-    count: fn() count
-    ii: fn() ii
-    key: OKey := fn() optionKeys.(ii)
-    
-    getItem: fn() options.(OKey())
-
-    EListen: fn(cb) s('enter') |> onKeyPress(cb)
-  
-    moveBack: fn moveBack(cb) if ii < count - 1 -> {
-      ii <- ii + 1
-    
-      if scrollBar.TW != ? -> scrollBar.TW.finish()
-
-      scrollBar.TW <- tween(
-        scrollBar.pos.x
-        scrollBar.pos.x - WIDTH
-        0.2
-        fn(v) scrollBar.pos.x <- v
-        easings.easeOutQuad
-      )
-
-      textgo := scrollBar.children.(ii)
-
-      with std.each(scrollBar.children) fn(scrollChild, ic) {
-        if ic != ii -> scrollChild.color <- WHITE
-      }
-      
-      textgo.color <- YELLOW
-
-      with scrollBar.TW.onEnd() fn {
-        scrollBar.TW <- ?
-      }
-
-      cb()
-    }
-
-    moveForward: fn moveForward(cb) if ii > 0 -> {
-      ii <- ii - 1
-    
-      if scrollBar.TW != ? -> scrollBar.TW.finish()
-
-      scrollBar.TW <- tween(
-        scrollBar.pos.x
-        scrollBar.pos.x + WIDTH
-        0.2
-        fn(v) scrollBar.pos.x <- v
-        easings.easeOutQuad
-      )
-
-      textgo := scrollBar.children.(ii)
-
-      with std.each(scrollBar.children) fn(scrollChild, ic) {
-        if ic != ii -> scrollChild.color <- WHITE
-      }
-      
-      textgo.color <- YELLOW
-
-      with scrollBar.TW.onEnd() fn {
-        scrollBar.TW <- ?
-      }
-
-      cb()
-    }
-  }}
-}
-
-fn ScrollableList(options, colors, y, di) {
-  colors := colors |> std.default([])
-  COL1 := colors.0 |> std.default(WHITE)
-  COL2 := colors.1 |> std.default(YELLOW)
-
-  HEIGHT := y |> std.default(300)
-  DIST := di |> std.default(30)
-
-  count := options |> len()
-  ii := 0
-
-  scrollBar := with add() [
-    pos(
-      20
-      center().y - (DIST + HEIGHT)
-    )
-  ]
-
-  scrollBar.TW := ?
-
-  optionKeys := keys(options)
-  with std.each(options) fn(ii, ic) {
-    with scrollBar.add() [
-      text(optionKeys.(ic), {
-        size: 36
-        color: WHITE
-        width: 500
-        font: s('gwibble')
-      })
-
-      pos(0, DIST + (DIST * ic) + (HEIGHT))
-    ]
-  }
-
-  // @ Text stuff
-  (scrollBar.children.0).color <- YELLOW
-
-  {{
-    count: fn() count
-    ii: fn() ii
-    key: OKey := fn() optionKeys.(ii)
-
-    getItem: fn() options.(OKey())
-
-    EListen: fn(cb) s('enter') |> onKeyPress(cb)
-
-    moveBack: fn moveBack(cb) if ii < count - 1 -> {
-      ii <- ii + 1
-
-      if scrollBar.TW != ? -> scrollBar.TW.finish()
-
-      scrollBar.TW <- tween(
-        scrollBar.pos.y
-        scrollBar.pos.y - DIST
-        0.2
-        fn(v) scrollBar.pos.y <- v
-        easings.easeOutQuad
-      )
-
-      textgo := scrollBar.children.(ii)
-
-      with std.each(scrollBar.children) fn(scrollChild, ic) {
-        if ic != ii -> scrollChild.color <- WHITE
-      }
-
-      textgo.color <- YELLOW
-
-      with scrollBar.TW.onEnd() fn {
-        scrollBar.TW <- ?
-      }
-
-      cb()
-    }
-
-    moveForward: fn moveForward(cb) if ii > 0 -> {
-      ii <- ii - 1
-
-      if scrollBar.TW != ? -> scrollBar.TW.finish()
-
-      scrollBar.TW <- tween(
-        scrollBar.pos.y
-        scrollBar.pos.y + DIST
-        0.2
-        fn(v) scrollBar.pos.y <- v
-        easings.easeOutQuad
-      )
-
-      textgo := scrollBar.children.(ii)
-
-      with std.each(scrollBar.children) fn(scrollChild, ic) {
-        if ic != ii -> scrollChild.color <- WHITE
-      }
-
-      textgo.color <- YELLOW
-
-      with scrollBar.TW.onEnd() fn {
-        scrollBar.TW <- ?
-      }
-
-      cb()
-    }
-  }}
-}
-
-// ---
-
 fn createBeatHandler {
   lastBeatTime := 0
 
@@ -498,10 +115,6 @@ fn createBeatHandler {
     }
   }}
 }
-
-// ---
-
-
 
 // ---
 
