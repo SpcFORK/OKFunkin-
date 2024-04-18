@@ -36,6 +36,7 @@ GLOBAL_LOADED_FILES := window.GLOBAL_LOADED_FILES := {
   CHROMEOS: CHROMEOS
   
   SUPERCOMMONCOLOUR: SUPERCOMMONCOLOUR
+  createBeatHandler: createBeatHandler
 
   getFInput: getFInput
   enterNextH: enterNextH
@@ -93,28 +94,6 @@ PRELOAD := import('menu/preload')
 
   menuMusic: menuMusic
 } := PRELOAD
-
-// ---
-
-fn createBeatHandler {
-  lastBeatTime := 0
-
-  {{
-    activateBeat: fn(bpm) {
-      beatInterval := 60000 / bpm
-      currentTime := time()
-
-      if currentTime - lastBeatTime > beatInterval / 1000 {
-        true -> {
-          lastBeatTime <- currentTime
-          true
-        }
-        
-        false -> false
-      }
-    }
-  }}
-}
 
 // ---
 
