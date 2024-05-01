@@ -1,0 +1,117 @@
+std := import('std')
+Once := std.once
+
+str := import('str')
+json := import('json')
+rng := import('random')
+
+
+{
+  FirstInput?: FirstInput?
+  IS_IFRAME: IS_IFRAME
+  CHROMEOS: CHROMEOS
+
+  SUPERCOMMONCOLOUR: SUPERCOMMONCOLOUR
+  createBeatHandler: createBeatHandler
+
+  getFInput: getFInput
+  enterNextH: enterNextH
+
+  playMenuEnter: playMenuEnter
+  MEnterTrigger: MEnterTrigger
+
+  currentAudio: currentAudio
+
+  playMenuEnter: playMenuEnter
+  stopConfirm: stopConfirm
+  MEnterTrigger: MEnterTrigger
+
+  playMenuMusic: playMenuMusic
+  stopMenuMusic: stopMenuMusic
+
+  playTickSound: playTickSound
+  stopTickSound: stopTickSound
+
+  createPlayer: createPlayer
+  createGhosty: createGhosty
+
+  createMenuStructure: createMenuStructure
+  ScrollableMenu: ScrollableMenu
+  ScrollableList: ScrollableList
+} := import('core')
+
+
+{ newCut: newCut } := import('../ware/cutscene')
+{ shakey: shakey } := import('../blocks/shakey')
+
+
+with scene('menuScreen') fn {
+
+  enterNextH('gameSelect')
+  with enterNextH('intro', 'escape') fn {
+    stopMenuMusic()
+  }
+
+  // ---
+
+  MEnterTrigger()
+
+  // ---
+
+  bpmh := createBeatHandler()
+
+  menu_logo := with add() [
+    with sprite() s('menu_logo')
+    pos(center())
+    with anchor() s('center')
+    scale(0.5)
+  ]
+
+  kaboomBG := with add() [
+    with sprite() s('kaboom_bg')
+    pos(menu_logo.pos.x + 125, menu_logo.pos.y + 75)
+    with anchor() s('center')
+    scale(0.5)
+  ]
+
+  kaboomText := with add() [
+    with sprite() s('kaboom')
+    pos(kaboomBG.pos)
+    with anchor() s('center')
+    scale(0.5)
+  ]
+
+  text_ := with add() [
+    text('Press Enter to Start!' |> s(), {
+      size: 16
+      font: s('sink')
+      align: 'center' |> s()
+    })
+
+    pos(menu_logo.pos.x, menu_logo.pos.y + 200)
+    with anchor() s('center')
+  ]
+
+  // ---
+
+  scl := 0.5
+  udc := with onUpdate() fn {
+
+    if bpmh.activateBeat(100) { 
+      true -> {
+        menu_logo.use(
+          scale(scl <- 0.4)
+        )
+      }
+
+      false -> {
+        scl <- scl + 0.001
+        menu_logo.use(
+          scale(scl)
+        )
+      }
+    }
+
+  }
+
+}

@@ -79,6 +79,8 @@ GLOBAL_LOADED_FILES := window.GLOBAL_LOADED_FILES := {
 // @Preload
 
 PRELOAD := import('menu/preload')
+loadingScreen := import('loadingScreen')
+actualGame := import('actualGame')
 
 {
   gwibble: gwibble
@@ -97,435 +99,7 @@ PRELOAD := import('menu/preload')
 
 // ---
 
-with scene('inputCheck') fn(data) {
-  if data.next != ? -> {
-
-    if FirstInput? {
-      false -> getFInput(data.next)
-      true -> data.next()
-    }
-    
-  }
-
-  // ---
-
-  txt := with do() '
-    add([
-      text(
-        "Please press anywhere on the canvas.",
-        {
-          size: 18,
-          width: width() * 0.75,
-          font: "sink",
-          align: "center"
-        }
-      ),
-      pos(center()),
-      anchor("center")
-    ])
-  '
-}
-
-// ---
-
-with scene('intro') fn {
-
-  playMenuMusic()
-
-  setBackground(BLACK)
-
-  firstTrack := newCut()
-  
-  // ---
-
-  enterNextH('menuScreen')
-  enterNextH('intro', 'escape')
-
-  // ---
-  
-  txt := with do() '
-    add([
-      text(
-        "KaboomFunkin\\\'",
-        {
-          size: 42,
-          width: width() * 0.75,
-          font: "gwibble",
-          align: "center"
-        }
-      ),
-      pos(center()),
-      anchor("center")
-    ])
-  '
-
-  cowingLogo := with add() [
-    with sprite() 'cowing' |> s()
-    pos(center())
-    with anchor() 'center' |> s()
-    scale(0.1)
-  ]
-
-  // @semi-components
-  with shakey() txt
-  with shakey() cowingLogo
-
-  // ---
-
-  cutArr := [
-
-    // Initally Hidden
-    [0, [txt, 0]]
-    [0, [cowingLogo, 0]]
-    
-    [2, [txt, 1]]
-    [3.2, [txt, 0]]
-
-    [2, fn {
-      txt.text <- 'Made by Spectcow\n'
-    }]
-    [0, [txt, 1]]
-    
-    [3, fn {
-      txt.text <- txt.text + 'He\'s so cool !'
-    }]
-    
-    [3.2, [txt, 0]]
-
-    // @ Intro Random Text
-    [2, fn {
-      choice := introTexts |> str.split('\n') |> rng.choice()
-      txt.text <- ''
-
-      choice |> str.split('--') |> with std.each() fn(ii, ic) {
-        with wait(1.2 * ic) fn() txt.text <- txt.text + ii << '\n'
-      }
-    }]
-    [0, [txt, 1]]
-    
-    [4, [txt, 0]]
-
-    [2, fn() Transition(WHITE).fadeIn(2)]
-    // 2 + fadeTime
-    [3 + 2, fn() go('menuScreen')]
-  ]
-
-  with firstTrack.Cutscene(cutArr) fn(ii) if type(ii) {
-    :function -> ii()
-    _ -> {
-      (ii.0).opacity <- ii.1 |> std.default((ii.0).opacity)
-    }
-  }
-}
-
-// ---
-
-with scene('menuScreen') fn {
-
-  enterNextH('gameSelect')
-  with enterNextH('intro', 'escape') fn {
-    stopMenuMusic()
-  }
-
-  // ---
-
-  MEnterTrigger()
-  
-  // ---
-
-  bpmh := createBeatHandler()
-
-  menu_logo := with add() [
-    with sprite() s('menu_logo')
-    pos(center())
-    with anchor() s('center')
-    scale(0.5)
-  ]
-
-  kaboomBG := with add() [
-    with sprite() s('kaboom_bg')
-    pos(menu_logo.pos.x + 125, menu_logo.pos.y + 75)
-    with anchor() s('center')
-    scale(0.5)
-  ]
-
-  kaboomText := with add() [
-    with sprite() s('kaboom')
-    pos(kaboomBG.pos)
-    with anchor() s('center')
-    scale(0.5)
-  ]
-
-  text_ := with add() [
-    text('Press Enter to Start!' |> s(), {
-      size: 16
-      font: s('sink')
-      align: 'center' |> s()
-    })
-    
-    pos(menu_logo.pos.x, menu_logo.pos.y + 200)
-    with anchor() s('center')
-  ]
-
-  // ---
-
-  scl := 0.5
-  udc := with onUpdate() fn {
-  
-    if bpmh.activateBeat(100) { 
-      true -> {
-        menu_logo.use(
-          scale(scl <- 0.4)
-        )
-      }
-      
-      false -> {
-        scl <- scl + 0.001
-        menu_logo.use(
-          scale(scl)
-        )
-      }
-    }
-    
-  }
-  
-}
-
-with scene('options') fn {
-
-  enterNextH('gameSelect', 'escape')
-
-  // ---
-
-  songs := {
-    'Graphics': fn() go('op_graphics')
-    'Audio': fn() go('op_audio')
-    'Keybinds': fn() go('op_kb')
-    'Adv. Opts': fn() go('op_adv')
-    'Leave': fn() go('gameSelect')
-  }
-
-  // ---
-
-  songKeys := keys(songs)
-
-  sl := ScrollableList(songs, ?, ?, 50)
-
-  fn moveUp {
-    with sl.moveForward() fn() playTickSound()
-  }
-
-  fn moveDown {
-    with sl.moveBack() fn() playTickSound()
-  }
-
-  // ---
-
-  s('up') |> with onKeyPressRepeat() moveUp
-  s('w') |> with onKeyPressRepeat() moveUp
-
-  s('down') |> with onKeyPressRepeat() moveDown
-  s('s') |> with onKeyPressRepeat() moveDown
-
-  // ---
-
-  with sl.EListen() with std.once() fn {
-    songCall := sl.getItem()
-    songCall()
-  }
-}
-
-with scene('op_graphics') fn {
-
-  enterNextH('options', 'escape')
-
-  // ---
-
-  options := {
-    'Gamma': fn() go('op_graphics_gamma')
-    'Zoom': fn() go('op_graphics_zoom')
-    'No Shaders': fn() go('op_graphics_shaders')
-    'Leave': fn() go('options')
-  }
-
-  // ---
-
-  optionKeys := keys(options)
-
-  sl := ScrollableList(options, ?, ?, 50)
-
-  fn moveUp {
-    with sl.moveForward() fn() playTickSound()
-  }
-
-  fn moveDown {
-    with sl.moveBack() fn() playTickSound()
-  }
-
-  // ---
-
-  s('up') |> with onKeyPressRepeat() moveUp
-  s('w') |> with onKeyPressRepeat() moveUp
-
-  s('down') |> with onKeyPressRepeat() moveDown
-  s('s') |> with onKeyPressRepeat() moveDown
-
-  // ---
-
-  with sl.EListen() with std.once() fn {
-    optionCall := sl.getItem()
-    optionCall()
-  }
-}
-
-with scene('op_audio') fn {
-
-  enterNextH('options', 'escape')
-
-  // ---
-
-  options := {
-    'All': fn() go('op_audio_all')
-    'Music': fn() go('op_audio_msc')
-    'Vocals': fn() go('op_audio_vcl')
-    'Sounds': fn() go('op_audio_snd')
-    'Leave': fn() go('options')
-  }
-
-  // ---
-
-  optionKeys := keys(options)
-
-  sl := ScrollableList(options, ?, ?, 50)
-
-  fn moveUp {
-    with sl.moveForward() fn() playTickSound()
-  }
-
-  fn moveDown {
-    with sl.moveBack() fn() playTickSound()
-  }
-
-  // ---
-
-  s('up') |> with onKeyPressRepeat() moveUp
-  s('w') |> with onKeyPressRepeat() moveUp
-
-  s('down') |> with onKeyPressRepeat() moveDown
-  s('s') |> with onKeyPressRepeat() moveDown
-
-  // ---
-
-  with sl.EListen() with std.once() fn {
-    optionCall := sl.getItem()
-    optionCall()
-  }
-}
-
-with scene('op_kb') fn {
-
-  enterNextH('options', 'escape')
-
-  // ---
-
-  options := {
-    'Game': fn() go('op_kb_g')
-    'Menu': fn() go('op_kb_m')
-    'Mods': fn() go('op_kb_c')
-    'Leave': fn() go('options')
-  }
-
-  // ---
-
-  optionKeys := keys(options)
-
-  sl := ScrollableList(options, ?, ?, 50)
-
-  fn moveUp {
-    with sl.moveForward() fn() playTickSound()
-  }
-
-  fn moveDown {
-    with sl.moveBack() fn() playTickSound()
-  }
-
-  // ---
-
-  s('up') |> with onKeyPressRepeat() moveUp
-  s('w') |> with onKeyPressRepeat() moveUp
-
-  s('down') |> with onKeyPressRepeat() moveDown
-  s('s') |> with onKeyPressRepeat() moveDown
-
-  // ---
-
-  with sl.EListen() with std.once() fn {
-    optionCall := sl.getItem()
-    optionCall()
-  }
-}
-
-with scene('op_adv') fn {
-
-  enterNextH('options', 'escape')
-
-  // ---
-
-  options := {
-    'Leave': fn() go('options')
-  }
-
-  // ---
-
-  optionKeys := keys(options)
-
-  sl := ScrollableList(options, ?, ?, 50)
-
-  fn moveUp {
-    with sl.moveForward() fn() playTickSound()
-  }
-
-  fn moveDown {
-    with sl.moveBack() fn() playTickSound()
-  }
-
-  // ---
-
-  s('up') |> with onKeyPressRepeat() moveUp
-  s('w') |> with onKeyPressRepeat() moveUp
-
-  s('down') |> with onKeyPressRepeat() moveDown
-  s('s') |> with onKeyPressRepeat() moveDown
-
-  // ---
-
-  with sl.EListen() with std.once() fn {
-    optionCall := sl.getItem()
-    optionCall()
-  }
-}
-
-with scene('credits') fn {
-
-  enterNextH('gameSelect', 'escape')
-
-  // ---
-
-  creditStr := 
-    'SpectCOW (SpcFORK), Creator of KaboomFunkin.\n' <<
-    'Thanks for playing!'
-
-  with add() [
-    text(creditStr, {
-      size: 12 * 1.5
-      align: s('center')
-    })
-
-    with pos() center()
-    with anchor() s('center')
-  ]
-
-}
+menuAll := import('menu/all')
 
 // ---
 
@@ -648,6 +222,18 @@ with scene('gameSelect') fn {
 }
 
 // ---
+// @Storymode
+//   Expect to come here a lot.
+
+StoryWeeks := {
+  'Week 1': fn() console.log('week')
+  'Week 2': fn() console.log('week')
+  'Week 3': fn() console.log('week')
+  'Week 4': fn() console.log('week')
+  'Week 5': fn() console.log('week')
+  'Week 6': fn() console.log('week')
+  'Week 7': fn() console.log('week')
+}
 
 with scene('storyMode') fn {
 
@@ -687,64 +273,86 @@ with scene('storyMode') fn {
 
   // ---
 
-  weeks := {
-    'Week 1': fn() console.log('week')
-    'Week 2': fn() console.log('week')
-    'Week 3': fn() console.log('week')
-    'Week 4': fn() console.log('week')
-    'Week 5': fn() console.log('week')
-    'Week 6': fn() console.log('week')
-    'Week 7': fn() console.log('week')
+  WeekNames := []
+  // 8 Being 7 weeks then next stop
+  with std.loop(8) fn(ii) {
+    WeekNames << ('Week ' + s(ii))
   }
 
-  weekKeys := keys(weeks)
+  fn Week1Load {
+    // Do Cutscene
+    // We also do loading during them because thats cool downtime!
 
-  sm := ScrollableMenu(weeks)
+    cutsc := newCut()
+    [
+      // In
+      [0.05, fn() console.log(1)]
+      [0.05, fn() console.log(2)]
+      [0.05, fn() console.log(3)]
+      [0.05, leave!]
+    ] |> with cutsc.Cutscene() fn() {}
+    
+    // Then leave
+    fn leave!() go('loading', {
+      cb: fn {
+        Promise |> with new() fn(r) r()
+      }
+    })
+  }
+
+  Weeks := {
+    WeekNames.1: Week1Load
+  }
+
+  WeekTexts := {
+    WeekNames.1: [
+      'Daddy Dearest'
+      'A unique storyline, Kaboom themed'
+    ]
+
+    WeekNames.2: [
+      'The Spookies'
+      'Your old friend, Freeplay.'
+    ]
+
+    WeekNames.3: [
+      'Pico'
+      'Change how your game works'
+    ]
+
+    WeekNames.4: [
+      'Mommy Mearest'
+      'The credits, thank the ones in it!'
+    ]
+
+    WeekNames.5: [
+      'Mommy Mearest'
+      'The credits, thank the ones in it!'
+    ]
+
+    WeekNames.6: [
+      'Christmas'
+      'Quit the game, boooring.'
+    ]
+
+    WeekNames.7: [
+      'Senpai'
+      'Quit the game, boooring.'
+    ]
+
+    WeekNames.8: [
+      'Tankman'
+      'Quit the game, boooring.'
+    ]
+  }
+
+  sm := ScrollableMenu(Weeks)
 
   // ---
 
-  fn changeTexts if sm.key() {
-    weekKeys.0 -> setText(
-      ?
-      'Daddy Dearest'
-      'A unique storyline, Kaboom themed'
-    )
-
-    weekKeys.1 -> setText(
-      ?
-      'The Spookies'
-      'Your old friend, Freeplay.'
-    )
-
-    weekKeys.2 -> setText(
-      ?
-      'Pico'
-      'Change how your game works'
-    )
-
-    weekKeys.3 -> setText(
-      ?
-      'Mommy Mearest'
-      'The credits, thank the ones in it!'
-    )
-
-    weekKeys.4 -> setText(
-      ?
-      'Christmas'
-      'Quit the game, boooring.'
-    )
-
-    weekKeys.5 -> setText(
-      ?
-      'Senpai'
-      'Quit the game, boooring.'
-    )
-
-    weekKeys.6 -> setText(
-      ?
-      'Tankman'
-      'Quit the game, boooring.'
-    )
+  fn changeTexts {
+    weekbarText := WeekTexts.(sm.key()) |> std.default([?,?,?])
+    setText(?, weekbarText...)
   }
 
   fn moveLeft {

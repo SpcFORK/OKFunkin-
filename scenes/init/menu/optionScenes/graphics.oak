@@ -1,0 +1,85 @@
+std := import('std')
+Once := std.once
+
+str := import('str')
+json := import('json')
+rng := import('random')
+
+
+{
+  FirstInput?: FirstInput?
+  IS_IFRAME: IS_IFRAME
+  CHROMEOS: CHROMEOS
+
+  SUPERCOMMONCOLOUR: SUPERCOMMONCOLOUR
+  createBeatHandler: createBeatHandler
+
+  getFInput: getFInput
+  enterNextH: enterNextH
+
+  playMenuEnter: playMenuEnter
+  MEnterTrigger: MEnterTrigger
+
+  currentAudio: currentAudio
+
+  playMenuEnter: playMenuEnter
+  stopConfirm: stopConfirm
+  MEnterTrigger: MEnterTrigger
+
+  playMenuMusic: playMenuMusic
+  stopMenuMusic: stopMenuMusic
+
+  playTickSound: playTickSound
+  stopTickSound: stopTickSound
+
+  createPlayer: createPlayer
+  createGhosty: createGhosty
+
+  createMenuStructure: createMenuStructure
+  ScrollableMenu: ScrollableMenu
+  ScrollableList: ScrollableList
+} := import('../../core')
+
+
+with scene('op_graphics') fn {
+
+  enterNextH('options', 'escape')
+
+  // ---
+
+  options := {
+    'Gamma': fn() go('op_graphics_gamma')
+    'Zoom': fn() go('op_graphics_zoom')
+    'No Shaders': fn() go('op_graphics_shaders')
+    'Leave': fn() go('options')
+  }
+
+  // ---
+
+  optionKeys := keys(options)
+
+  sl := ScrollableList(options, ?, ?, 50)
+
+  fn moveUp {
+    with sl.moveForward() fn() playTickSound()
+  }
+
+  fn moveDown {
+    with sl.moveBack() fn() playTickSound()
+  }
+
+  // ---
+
+  s('up') |> with onKeyPressRepeat() moveUp
+  s('w') |> with onKeyPressRepeat() moveUp
+
+  s('down') |> with onKeyPressRepeat() moveDown
+  s('s') |> with onKeyPressRepeat() moveDown
+
+  // ---
+
+  with sl.EListen() with Once() fn {
+    optionCall := sl.getItem()
+    optionCall()
+  }
+}

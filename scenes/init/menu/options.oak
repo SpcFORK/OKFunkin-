@@ -1,0 +1,89 @@
+std := import('std')
+Once := std.once
+
+str := import('str')
+json := import('json')
+rng := import('random')
+
+
+{
+  FirstInput?: FirstInput?
+  IS_IFRAME: IS_IFRAME
+  CHROMEOS: CHROMEOS
+
+  SUPERCOMMONCOLOUR: SUPERCOMMONCOLOUR
+  createBeatHandler: createBeatHandler
+
+  getFInput: getFInput
+  enterNextH: enterNextH
+
+  playMenuEnter: playMenuEnter
+  MEnterTrigger: MEnterTrigger
+
+  currentAudio: currentAudio
+
+  playMenuEnter: playMenuEnter
+  stopConfirm: stopConfirm
+  MEnterTrigger: MEnterTrigger
+
+  playMenuMusic: playMenuMusic
+  stopMenuMusic: stopMenuMusic
+
+  playTickSound: playTickSound
+  stopTickSound: stopTickSound
+
+  createPlayer: createPlayer
+  createGhosty: createGhosty
+
+  createMenuStructure: createMenuStructure
+  ScrollableMenu: ScrollableMenu
+  ScrollableList: ScrollableList
+} := import('core')
+
+
+optionScenes := import('optionScenes/all')
+
+
+with scene('options') fn {
+
+  enterNextH('gameSelect', 'escape')
+
+  // ---
+
+  songs := {
+    'Graphics': fn() go('op_graphics')
+    'Audio': fn() go('op_audio')
+    'Keybinds': fn() go('op_kb')
+    'Adv. Opts': fn() go('op_adv')
+    'Leave': fn() go('gameSelect')
+  }
+
+  // ---
+
+  songKeys := keys(songs)
+
+  sl := ScrollableList(songs, ?, ?, 50)
+
+  fn moveUp {
+    with sl.moveForward() fn() playTickSound()
+  }
+
+  fn moveDown {
+    with sl.moveBack() fn() playTickSound()
+  }
+
+  // ---
+
+  s('up') |> with onKeyPressRepeat() moveUp
+  s('w') |> with onKeyPressRepeat() moveUp
+
+  s('down') |> with onKeyPressRepeat() moveDown
+  s('s') |> with onKeyPressRepeat() moveDown
+
+  // ---
+
+  with sl.EListen() with Once() fn {
+    songCall := sl.getItem()
+    songCall()
+  }
+}

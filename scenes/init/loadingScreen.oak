@@ -1,0 +1,140 @@
+std := import('std')
+
+
+{
+  FirstInput?: FirstInput?
+  IS_IFRAME: IS_IFRAME
+  CHROMEOS: CHROMEOS
+
+  SUPERCOMMONCOLOUR: SUPERCOMMONCOLOUR
+  createBeatHandler: createBeatHandler
+
+  getFInput: getFInput
+  enterNextH: enterNextH
+
+  playMenuEnter: playMenuEnter
+  MEnterTrigger: MEnterTrigger
+
+  currentAudio: currentAudio
+
+  playMenuEnter: playMenuEnter
+  stopConfirm: stopConfirm
+  MEnterTrigger: MEnterTrigger
+
+  playMenuMusic: playMenuMusic
+  stopMenuMusic: stopMenuMusic
+
+  playTickSound: playTickSound
+  stopTickSound: stopTickSound
+
+  createPlayer: createPlayer
+  createGhosty: createGhosty
+
+  createMenuStructure: createMenuStructure
+  ScrollableMenu: ScrollableMenu
+  ScrollableList: ScrollableList
+} := import('core')
+
+
+{ newCut: newCut } := import('../ware/cutscene')
+
+
+{
+  Transition: Transition
+  PixelTransition: PixelTransition
+} := import('../blocks/Transition')
+
+
+bgList := [
+  'sprites/menu/kblfront.png'
+]
+
+
+fn LoadSchema(obj, typed?) {
+  obj := obj |> std.default({})
+
+  if typed? {
+    ?, 'nw' -> with Object.assign({
+      type: 'basicWeek'
+      bg: '0'
+      cb: ?
+    }) obj
+
+    'ns' -> with Object.assign({
+      type: 'basicSong'
+      bg: '0'
+      cb: ?
+    }) obj
+  }
+}
+
+
+with scene('loading') fn(pData, typed?) {
+  stopMenuMusic()
+
+  tras := Transition(WHITE)
+  trs := Transition(BLACK)
+  tras.fadeOut(0.6)
+  trs.fadeOut(0.2)
+
+  pData := pData |> LoadSchema(typed?)
+
+  loadScreen := add([
+    sprite('loading_temp' |> s(), {
+      width: width()
+      height: height()
+    })
+    pos(0, height())
+    anchor('botleft' |> s())
+  ])
+
+  loadBar := add([
+    sprite('loadBar' |> s())
+    opacity(0.4)
+  ])
+
+  tabText := add([
+    text('Loading...' |> s(), {
+      size: 12 * 1.5
+      align: 'center' |> s()
+    })
+    pos(width() - 25, height() - (115 / 1.5))
+    anchor('botright' |> s())
+  ])
+
+  smallAboveBarText := add([
+    text('Loading...' |> s(), {
+      size: 12 * 1.5
+      align: 'center' |> s()
+    })
+    pos(25 / 2, height() - (50 / 1.5))
+    anchor('botleft' |> s())
+  ])
+
+  bar_ := add([
+    pos(25 / 2, height() - (25 / 1.5))
+    rect(2, 12)
+    anchor('botleft' |> s())
+    opacity(0.1)
+    // @Bar_ Methods
+    {
+      adjustPerc: fn(p) {
+        bar_.width := p * (width() - 50)
+      }
+    }
+  ])
+
+  // ---
+
+  bar_.adjustPerc(0.1)
+
+  if pData.cb != ? -> with pData.cb().then() fn(data) {
+    afterItemLoad(data, pData)
+  }
+
+  fn afterItemLoad(loadedData, pData) {
+    bar_.adjustPerc(0.4)
+
+    go('songGame', loadedData, pData)
+  }
+}

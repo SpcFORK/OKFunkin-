@@ -1,0 +1,4 @@
+adv := import('adv')
+audio := import('audio')
+graphics := import('graphics')
+key := import('key')

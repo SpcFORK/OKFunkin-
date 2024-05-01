@@ -1,0 +1,17 @@
+std := import('std')
+
+
+{
+  Transition: Transition
+  PixelTransition: PixelTransition
+} := import('../blocks/Transition')
+
+GameParts := import('./gameParts/all')
+
+
+// ----
+
+
+with scene('songGame') fn {
+
+}

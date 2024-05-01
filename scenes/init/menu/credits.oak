@@ -1,0 +1,56 @@
+{
+  FirstInput?: FirstInput?
+  IS_IFRAME: IS_IFRAME
+  CHROMEOS: CHROMEOS
+
+  SUPERCOMMONCOLOUR: SUPERCOMMONCOLOUR
+  createBeatHandler: createBeatHandler
+
+  getFInput: getFInput
+  enterNextH: enterNextH
+
+  playMenuEnter: playMenuEnter
+  MEnterTrigger: MEnterTrigger
+
+  currentAudio: currentAudio
+
+  playMenuEnter: playMenuEnter
+  stopConfirm: stopConfirm
+  MEnterTrigger: MEnterTrigger
+
+  playMenuMusic: playMenuMusic
+  stopMenuMusic: stopMenuMusic
+
+  playTickSound: playTickSound
+  stopTickSound: stopTickSound
+
+  createPlayer: createPlayer
+  createGhosty: createGhosty
+
+  createMenuStructure: createMenuStructure
+  ScrollableMenu: ScrollableMenu
+  ScrollableList: ScrollableList
+} := import('../core')
+
+
+with scene('credits') fn {
+
+  enterNextH('gameSelect', 'escape')
+
+  // ---
+
+  creditStr := 
+    'SpectCOW (SpcFORK), Creator of KaboomFunkin.\n' <<
+    'Thanks for playing!'
+
+  with add() [
+    text(creditStr, {
+      size: 12 * 1.5
+      align: s('center')
+    })
+
+    with pos() center()
+    with anchor() s('center')
+  ]
+
+}
