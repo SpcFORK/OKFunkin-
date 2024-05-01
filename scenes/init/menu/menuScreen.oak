@@ -38,11 +38,11 @@ rng := import('random')
   createMenuStructure: createMenuStructure
   ScrollableMenu: ScrollableMenu
   ScrollableList: ScrollableList
-} := import('core')
+} := import('../core')
 
 
-{ newCut: newCut } := import('../ware/cutscene')
-{ shakey: shakey } := import('../blocks/shakey')
+{ newCut: newCut } := import('../../ware/cutscene')
+{ shakey: shakey } := import('../../blocks/shakey')
 
 
 with scene('menuScreen') fn {

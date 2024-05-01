@@ -38,7 +38,7 @@ rng := import('random')
   createMenuStructure: createMenuStructure
   ScrollableMenu: ScrollableMenu
   ScrollableList: ScrollableList
-} := import('core')
+} := import('../core')
 
 
 optionScenes := import('optionScenes/all')
