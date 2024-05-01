@@ -1,0 +1,72 @@
+std := import('std')
+Once := std.once
+
+str := import('str')
+json := import('json')
+rng := import('random')
+
+
+{
+  FirstInput?: FirstInput?
+  IS_IFRAME: IS_IFRAME
+  CHROMEOS: CHROMEOS
+
+  SUPERCOMMONCOLOUR: SUPERCOMMONCOLOUR
+  createBeatHandler: createBeatHandler
+
+  getFInput: getFInput
+  enterNextH: enterNextH
+
+  playMenuEnter: playMenuEnter
+  MEnterTrigger: MEnterTrigger
+
+  currentAudio: currentAudio
+
+  playMenuEnter: playMenuEnter
+  stopConfirm: stopConfirm
+  MEnterTrigger: MEnterTrigger
+
+  playMenuMusic: playMenuMusic
+  stopMenuMusic: stopMenuMusic
+
+  playTickSound: playTickSound
+  stopTickSound: stopTickSound
+
+  createPlayer: createPlayer
+  createGhosty: createGhosty
+
+  createMenuStructure: createMenuStructure
+  ScrollableMenu: ScrollableMenu
+  ScrollableList: ScrollableList
+} := import('../../core')
+
+
+{
+  Transition: Transition
+  PixelTransition: PixelTransition
+} := import('../../../blocks/Transition')
+
+
+{ newCut: newCut } := import('../../../ware/cutscene')
+{ shakey: shakey } := import('../../../blocks/shakey')
+
+
+fn load {
+  fn leave!() go('loading', {
+    cb: fn {
+      Promise |> with new() fn(r) r()
+    }
+  })
+
+  // Do Cutscene
+  // We also do loading during them because thats cool downtime!
+  cutsc := newCut()
+  [
+    // In
+    [0.05, fn() console.log(1)]
+    [0.05, fn() console.log(2)]
+    [0.05, fn() console.log(3)]
+    // Then leave
+    [0.05, leave!]
+  ] |> with cutsc.Cutscene() fn {}
+}

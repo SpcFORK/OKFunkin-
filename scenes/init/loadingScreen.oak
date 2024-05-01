@@ -135,6 +135,8 @@ with scene('loading') fn(pData, typed?) {
   fn afterItemLoad(loadedData, pData) {
     bar_.adjustPerc(0.4)
 
-    go('songGame', loadedData, pData)
+    // We will wait 0.2 to be able to see loading screen
+    // yeah  its super wuick.
+    with wait(0.2) fn() go('songGame', loadedData, pData)
   }
 }

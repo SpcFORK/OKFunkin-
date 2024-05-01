@@ -52,6 +52,14 @@ rng := import('random')
 
 
 // ---
+// @Weekloaders
+
+{
+  week1: week1
+} := import('weekLoading/all')
+
+
+// ---
 // @Storymode
 //   Expect to come here a lot.
 
@@ -109,29 +117,8 @@ with scene('storyMode') fn {
     WeekNames << ('Week ' + s(ii))
   }
 
-  fn Week1Load {
-    // Do Cutscene
-    // We also do loading during them because thats cool downtime!
-
-    cutsc := newCut()
-    [
-      // In
-      [0.05, fn() console.log(1)]
-      [0.05, fn() console.log(2)]
-      [0.05, fn() console.log(3)]
-      [0.05, leave!]
-    ] |> with cutsc.Cutscene() fn() {}
-
-    // Then leave
-    fn leave!() go('loading', {
-      cb: fn {
-        Promise |> with new() fn(r) r()
-      }
-    })
-  }
-
   Weeks := {
-    WeekNames.1: Week1Load
+    WeekNames.1: week1.load
   }
 
   WeekTexts := {
