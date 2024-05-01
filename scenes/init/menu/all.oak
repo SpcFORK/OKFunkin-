@@ -3,5 +3,9 @@ intro := import('intro')
 inputCheck := import('inputCheck')
 menuScreen := import('menuScreen')
 
+gameSelect := import('gameSelect')
+storyMode := import('storyMode')
+freeplay := import('freeplay')
+
 credits := import('credits')
 options := import('options')
