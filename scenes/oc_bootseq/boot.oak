@@ -9,7 +9,9 @@ gwibble := loadFont(
 
 { shakey: shakey } := import('../blocks/shakey')
 
-with scene('init') fn {
+with scene('init__') fn {
+
+  setBackground(WHITE)
 
   names := [
     'SpectCOW'
@@ -18,7 +20,7 @@ with scene('init') fn {
     'Midialive'
     'Seedw'
     'Spcv'
-    'Commercialcheck'
+    'Comercialcheck'
     'Bull ahh mf'
   ]
 
@@ -54,11 +56,13 @@ with scene('init') fn {
   
   with wait(_ta(3)) fn {
     HIDE()
-    TEXT(2024)
+    TEXT(
+      (new(Date)).getFullYear()
+    )
   }
   
-  with wait(_ta(3)) SHOW
+  with wait(_ta(3/2)) SHOW
   
-  with wait(_ta(3)) HIDE
-  with wait(_ta(3/2)) fn() go('game')
+  with wait(_ta(2)) HIDE
+  with wait(_ta(3/2)) fn() go('boot__')
 }

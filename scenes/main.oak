@@ -2,4 +2,4 @@ init := import('init/main')
 
 bseq := import('oc_bootseq/main')
 
-go('boot__')
+go('init__')

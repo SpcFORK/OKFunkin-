@@ -2,6 +2,8 @@
   Transition: Transition
 } := import('../blocks/Transition')
 
+notes := import('../notes/main')
+
 std := import('std')
 
 // ---
@@ -13,6 +15,8 @@ std := import('std')
 
 oK_ := OKloadSprite('oakcart', '/sprites/oakcart.png')
 
+_b2 := import('boot')
+
 with scene('boot__') fn {
 
   setBackground(WHITE)
@@ -21,11 +25,11 @@ with scene('boot__') fn {
     sprite(oK_, {
       width: 200
     })
-    
+
     pos(center())
 
     anchor('center' |> s())
-    
+
     opacity(0)
   ])
 
@@ -38,36 +42,36 @@ with scene('boot__') fn {
   cutsc_scale := newCut()
 
   // time | scale
-  cutsc_scale.sh.step(2)
+  cutsc_scale.sh.step(1)
   [
     // In
     [0.05, 0.7]
     [0.05, 0.9]
     [0.05, 1]
   ] |> with cutsc_scale.Cutscene() fn(i) if ! CANCELLED? -> logo_.scale <- i
-  
+
   // time | opac
-  cutsc.sh.step(2)
+  cutsc.sh.step(1)
   [
     // In
     [0.1, 0.2]
     [0.1, 0.7]
     [0.1, 1]
-    
+
     // Begin Leave
     [3, 0.6]
     [0.5, 0.3]
     [0.5, 0.15]
     [0.5, 0]
-    
+
     [0.3, fn() Transition(BLACK).fadeIn(2)]
     // 2 + fadeTime
-    [2 + 2, fn() go('init')]
-    
+    [2 + 2, fn() go('game')]
+
   ] |> cutsc.Cutscene(setOpac)
 
   with onKeyPress(s('enter')) fn if ! CANCELLED? -> {
     CANCELLED? <- true
-    go('init')
+    go('game')
   }
 }
