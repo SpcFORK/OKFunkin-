@@ -1,0 +1,7 @@
+<!-- 
+  We define a place to fetch all our weeks
+  This is how we'll fetch them all from the client.
+-->
+<data weeklist="StoryLine">
+  weekLevels/mlp/EmptyWeek/main.xml
+</data>

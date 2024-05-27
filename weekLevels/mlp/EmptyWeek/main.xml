@@ -1,0 +1,10 @@
+<!-- KF FNF Week magic. -->
+<data>
+  <weekname>Week 1</weekname>
+  <topright>"Oh, Dearest"</topright>
+  <songs root="weekLevels/mlp/EmptyWeek/songs/">
+    <song1>dadbattle/song.xml</song1>
+    <song2>dadbattle/song.xml</song2>
+    <song3>dadbattle/song.xml</song3>
+  </songs>
+</data>

@@ -1,0 +1,17 @@
+<data>
+  <playbacks>
+    <basicFNF starts="starts">
+      <song>weeks/songs/dadbattle/song.ogg</song>
+      <vocals>weeks/songs/dadbattle/voices.ogg</vocals>
+    </basicFNF>
+    <other></other>
+  </playbacks>
+  <entry root="weekLevels/mlp/EmptyWeek/songs/dadbattle/entry/">
+    <on event="entry">entry.oak</on>
+  </entry>
+  <preload>
+    <fold cd="../sprites">
+  </preload>
+  <bpm>120</bpm>
+  <mainside try="true">right</mainside>
+</data>
