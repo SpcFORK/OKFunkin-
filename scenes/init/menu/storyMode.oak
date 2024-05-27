@@ -56,22 +56,43 @@ rng := import('random')
 
 {
   week1: week1
+  week2: week2
+  week3: week3
+  week4: week4
+  week5: week5
+  week6: week6
+  week7: week7
+  week8: week8
 } := import('weekLoading/all')
-
 
 // ---
 // @Storymode
 //   Expect to come here a lot.
 
 StoryWeeks := {
-  'Week 1': fn() console.log('week')
-  'Week 2': fn() console.log('week')
-  'Week 3': fn() console.log('week')
-  'Week 4': fn() console.log('week')
-  'Week 5': fn() console.log('week')
-  'Week 6': fn() console.log('week')
-  'Week 7': fn() console.log('week')
+  'Week 1': week1.load
+  'Week 2': week2.load
+  'Week 3': week3.load
+  'Week 4': week4.load
+  'Week 5': week5.load
+  'Week 6': week6.load
+  'Week 7': week7.load
+  'Week 8': week8.load
 }
+
+WeekNames := []
+// num + 1  weeks then next stop
+with std.loop(StoryWeeks |> len() + 1) fn(ic) {
+  WeekNames << ('Week ' + s(ic))
+}
+
+// @Modder  exposed
+window.StoryWeeks := {
+  get: fn() StoryWeeks
+  set: fn(k, x) StoryWeeks.(k) <- x
+}
+
+// ---
 
 with scene('storyMode') fn {
 
@@ -111,15 +132,7 @@ with scene('storyMode') fn {
 
   // ---
 
-  WeekNames := []
-  // 8 Being 7 weeks then next stop
-  with std.loop(8) fn(ii) {
-    WeekNames << ('Week ' + s(ii))
-  }
-
-  Weeks := {
-    WeekNames.1: week1.load
-  }
+  Weeks := StoryWeeks
 
   WeekTexts := {
     WeekNames.1: [
@@ -143,22 +156,22 @@ with scene('storyMode') fn {
     ]
 
     WeekNames.5: [
-      'Mommy Mearest'
-      'The credits, thank the ones in it!'
-    ]
-
-    WeekNames.6: [
       'Christmas'
       'Quit the game, boooring.'
     ]
 
-    WeekNames.7: [
+    WeekNames.6: [
       'Senpai'
       'Quit the game, boooring.'
     ]
 
-    WeekNames.8: [
+    WeekNames.7: [
       'Tankman'
+      'Quit the game, boooring.'
+    ]
+
+    WeekNames.8: [
+      'WeekEnd 1'
       'Quit the game, boooring.'
     ]
   }
@@ -192,7 +205,7 @@ with scene('storyMode') fn {
 
   // ---
 
-  with sm.EListen() with std.once() fn {
+  with sm.EListen() with Once() fn {
     weekCall := sm.getItem()
 
     Transition(BLACK).fadeIn(0.2)

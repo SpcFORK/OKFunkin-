@@ -1,1 +1,32 @@
 week1 := import('week1')
+week2 := import('week2')
+week3 := import('week3')
+week4 := import('week4')
+week5 := import('week5')
+week6 := import('week6')
+week7 := import('week7')
+week8 := import('week8')
+
+WeekCore := {
+  week1: week1
+  week2: week2
+  week3: week3
+  week4: week4
+  week5: week5
+  week6: week6
+  week7: week7
+  week8: week8
+}
+
+WeekKeys := keys(WeekCore)
+WeekValues := Object.values(WeekCore)
+
+fn addToThenRI(a, t, i) { a.(t |> s()) <- i, i }
+fn addToWIn(t, i) addToThenRI(window, t, i)
+
+// @Modder  exposed
+window.WeekHandler := {
+  WeekCore: addToWIn('WeekCore', WeekCore)
+  WeekKeys: addToWIn('WeekKeys', WeekKeys)
+  WeekValues: addToWIn('WeekValues', WeekValues)
+}

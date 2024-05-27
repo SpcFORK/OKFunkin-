@@ -28,7 +28,7 @@ requiredFiles = [".replit", "replit.nix", ".config", ".config/bin/oak"]
 [languages]
 
 [languages.javascript]
-pattern = "**/{*.js,*.jsx,*.ts,*.tsx,*.oak}"
+pattern = "**/{*.js,*.jsx,*.ts,*.tsx}"
   [languages.javascript.languageServer]
   start = "typescript-language-server --stdio"
 

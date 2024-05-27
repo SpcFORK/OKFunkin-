@@ -16,6 +16,7 @@
   "dependencies": {
     "@types/node": "^18.0.6",
     "kaboom": "^3000.1.17",
+    "kaplay": "^3000.1.17",
     "node-fetch": "^3.2.6",
     "ts-loader": "^9.5.1",
     "tsc": "^2.0.4",

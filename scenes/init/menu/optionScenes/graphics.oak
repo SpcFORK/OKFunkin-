@@ -83,3 +83,7 @@ with scene('op_graphics') fn {
     optionCall()
   }
 }
+
+with scene('op_graphics_gamma') fn {}
+with scene('op_graphics_zoom') fn {}
+with scene('op_graphics_shaders') fn {}

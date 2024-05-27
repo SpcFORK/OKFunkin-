@@ -1,0 +1,29 @@
+// © SpcFORK 2024
+
+std := import('std')
+
+// ML to Serialized Object or String.
+fn MLtoSObj(htmlStr, type) {
+  parser := with new() DOMParser
+  xmlDoc := parser.parseFromString(htmlStr, type)
+
+  fn parseNode(node) {
+    result := {}
+
+    fn handleNoChildren if node.attributes.length > 0 {
+      with std.each(node.attributes) fn(ii) if ii != ? -> result.(ii.name) <- ii.value
+      
+      true -> result.'__text' <- node.textContent
+      _ -> result <- node.textContent |> std.default('')
+    }
+    
+    if node.children.length = ? | node.children.length <= 0 {
+      true -> handleNoChildren()
+      _ -> with std.each(node.children) fn(ii) result.(ii.localName) <- parseNode(ii)
+    }
+    
+    result
+  }
+
+  parseNode(xmlDoc.documentElement)
+}

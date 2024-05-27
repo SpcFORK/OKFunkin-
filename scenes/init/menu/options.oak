@@ -50,7 +50,7 @@ with scene('options') fn {
 
   // ---
 
-  songs := {
+  options := {
     'Graphics': fn() go('op_graphics')
     'Audio': fn() go('op_audio')
     'Keybinds': fn() go('op_kb')
@@ -60,9 +60,9 @@ with scene('options') fn {
 
   // ---
 
-  songKeys := keys(songs)
+  songKeys := keys(options)
 
-  sl := ScrollableList(songs, ?, ?, 50)
+  sl := ScrollableList(options, ?, ?, 50)
 
   fn moveUp {
     with sl.moveForward() fn() playTickSound()

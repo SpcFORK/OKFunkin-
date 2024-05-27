@@ -81,6 +81,7 @@ GLOBAL_LOADED_FILES := window.GLOBAL_LOADED_FILES := {
 PRELOAD := import('menu/preload')
 loadingScreen := import('loadingScreen')
 actualGame := import('actualGame')
+gameParts := import('gameParts/all')
 
 {
   gwibble: gwibble

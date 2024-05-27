@@ -84,3 +84,9 @@ with scene('op_audio') fn {
     optionCall()
   }
 }
+
+
+with scene('op_audio_all') fn {}
+with scene('op_audio_msc') fn {}
+with scene('op_audio_vcl') fn {}
+with scene('op_audio_snd') fn {}

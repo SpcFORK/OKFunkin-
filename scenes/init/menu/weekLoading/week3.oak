@@ -41,50 +41,32 @@ rng := import('random')
 } := import('../../core')
 
 
-with scene('op_kb') fn {
+{
+  Transition: Transition
+  PixelTransition: PixelTransition
+} := import('../../../blocks/Transition')
 
-  enterNextH('options', 'escape')
 
-  // ---
+{ newCut: newCut } := import('../../../ware/cutscene')
+{ shakey: shakey } := import('../../../blocks/shakey')
 
-  options := {
-    'Game': fn() go('op_kb_g')
-    'Menu': fn() go('op_kb_m')
-    'Mods': fn() go('op_kb_c')
-    'Leave': fn() go('options')
-  }
 
-  // ---
+fn load {
+  fn leave!() go('loading', {
+    cb: fn {
+      Promise |> with new() fn(r) r()
+    }
+  })
 
-  optionKeys := keys(options)
-
-  sl := ScrollableList(options, ?, ?, 50)
-
-  fn moveUp {
-    with sl.moveForward() fn() playTickSound()
-  }
-
-  fn moveDown {
-    with sl.moveBack() fn() playTickSound()
-  }
-
-  // ---
-
-  s('up') |> with onKeyPressRepeat() moveUp
-  s('w') |> with onKeyPressRepeat() moveUp
-
-  s('down') |> with onKeyPressRepeat() moveDown
-  s('s') |> with onKeyPressRepeat() moveDown
-
-  // ---
-
-  with sl.EListen() with std.once() fn {
-    optionCall := sl.getItem()
-    optionCall()
-  }
+  // Do Cutscene
+  // We also do loading during them because thats cool downtime!
+  cutsc := newCut()
+  [
+    // In
+    [0.05, fn() console.log(1)]
+    [0.05, fn() console.log(2)]
+    [0.05, fn() console.log(3)]
+    // Then leave
+    [0.05, leave!]
+  ] |> with cutsc.Cutscene() fn {}
 }
-
-
-with scene('op_kb_g') fn {}
-with scene('op_kb_m') fn {}
-with scene('op_kb_c') fn {}

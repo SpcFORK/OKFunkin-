@@ -5,13 +5,16 @@ str := import('str')
 json := import('json')
 rng := import('random')
 
+
 {
   Transition: Transition
   PixelTransition: PixelTransition
 } := import('../blocks/Transition')
 
+
 { newCut: newCut } := import('../ware/cutscene')
 { shakey: shakey } := import('../blocks/shakey')
+
 
 // Check if we can play Sounds
 FirstInput? := false
@@ -100,7 +103,7 @@ fn enterNextH(sce, key?, cb) {
       nextPress.cancel()
 
       Transition(BLACK).fadeIn(0.2)
-      with wait(0.2) fn {
+      with wait(0.5) fn {
         go(sce)
         if cb != ? -> cb()
       }

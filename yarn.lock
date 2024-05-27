@@ -547,6 +547,11 @@ kaboom@^3000.1.17:
   resolved "https://registry.npmjs.org/kaboom/-/kaboom-3000.1.17.tgz"
   integrity sha512-npAtjGxj9Oj9vLpXfURck9eUPHR2ac1Lhc1bNcZ0NWcs+Lgs40Ty+wjujv1C2DwjWvxaX+3r2G64M35BS/Ry2g==
 
+kaplay@^3000.1.17:
+  version "3000.1.17"
+  resolved "https://registry.npmjs.org/kaplay/-/kaplay-3000.1.17.tgz"
+  integrity sha512-h2dwFuxGS7jrTTQafRLzxbBbG/M6yvV3kT4DvmbefWzwYr//68cNKl1Rz4l61bTDjEZTXcOzNwtsS2mwEJl5FQ==
+
 kind-of@^6.0.2:
   version "6.0.3"
   resolved "https://registry.npmjs.org/kind-of/-/kind-of-6.0.3.tgz"
