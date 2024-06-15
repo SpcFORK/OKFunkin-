@@ -18,7 +18,13 @@ rng := import('random')
 
 // Check if we can play Sounds
 FirstInput? := false
-IS_IFRAME := (window.location != window.parent.location)
+IS_IFRAME := do('
+  let res =  false;
+  try { res = window.location != window.parent.location }
+  catch {}
+')
+print('Is IFrame?')
+console.log(IS_IFRAME)
 CHROMEOS := navigator.userAgent.includes('CrOS')
 
 SUPERCOMMONCOLOUR := [248, 206, 86]

@@ -40,6 +40,28 @@ rng := import('random')
   ScrollableList: ScrollableList
 } := import('../core')
 
+{
+  Transition: Transition
+  PixelTransition: PixelTransition
+} := import('../../blocks/Transition')
+
+
+PRELOAD := import('./preload')
+{
+  gwibble: gwibble
+  beanSpr: beanSpr
+  ghostySpr: ghostySpr
+  menu_logoSpr: menu_logoSpr
+  loadBarSpr: loadBarSpr
+  loading_tempSpr: loading_tempSpr
+  kaboomSpr: kaboomSpr
+  kaboom_bgSpr: kaboom_bgSpr
+  cowingSpr: cowingSpr
+  introTexts: introTexts
+
+  menuMusic: menuMusic
+} := PRELOAD
+
 
 { newCut: newCut } := import('../../ware/cutscene')
 { shakey: shakey } := import('../../blocks/shakey')

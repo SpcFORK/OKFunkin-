@@ -7,8 +7,6 @@ str := import('str')
 json := import('json')
 rng := import('random')
 
-_b := import('boot')
-
 // ---
 
 // KSink
@@ -98,6 +96,8 @@ gameParts := import('gameParts/all')
   menuMusic: menuMusic
 } := PRELOAD
 
+Object.assign(globalThis, PRELOAD)
+
 // ---
 
 menuAll := import('menu/all')
@@ -107,6 +107,10 @@ menuAll := import('menu/all')
 FLAGS? := {
   init?: false
 }
+
+if IS_IFRAME -> document.body.style.transform := '
+  scale(0.7)
+'
 
 with scene('game') fn {
   if ! FLAGS?.init? {

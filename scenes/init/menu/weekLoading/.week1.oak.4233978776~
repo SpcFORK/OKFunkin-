@@ -56,6 +56,9 @@ fn leave!() go('loading', {
 })
 
 
+bf := ?
+
+
 with scene('cutscene_d_1') fn {
   stopMenuMusic()
 
@@ -83,75 +86,47 @@ with scene('cutscene_d_1') fn {
     anchor('center' |> s())
   ]
 
-  bottomText.typeOutText := fn(text, strict) {
-    if strict -> bottomText.text = ''
-    ttrack := 0
-    fn tr(n, cb) with wait(ttrack <- ttrack + n) cb
-    std.range(text |> s() |> len()) |> with std.each() fn(ii, b) {
-      console.log(s(text).(ii), b)
-      with tr(0.02) fn() bottomText.text <- (bottomText.text << s(text).(ii))
+  bottomText.typeOutText := with do() '
+  async function typeOutText(txt, delay = 0.1, strict) {
+    if (strict) bottomText.text = ""
+    for (let i = 0; i < txt.length; i++) {
+      await sleep(delay)
+      bottomText.text += txt[i]
     }
+    return bottomText.text
   }
-
-  fn clear!() bottomText.text <- s('')
+  '
+  
+  bottomText.backspaceText := with do() '
+  async function backspaceText(amm = 1, delay = 0.1) {
+    for (let i = 0; i < amm; i++) {
+      await sleep(delay)
+      bottomText.text = bottomText.text.slice(0, -1)
+    }
+    return bottomText.text
+  }
+  '
 
   bf := createPlayer(
     pos(width() / 4, height() / 2)
+    rotate(0)
   )
 
-  bf.use(rotate(0))
+  wait(5, d1continueSegment)
 
-  tr := Transition(color(WHITE))
-  tr.fadeOut(?, 5)
-
-  atrack := 0
-  fn tr(n, cb) with wait(atrack <- atrack + n) cb
-
-  with tr(2) fn() bottomText.typeOutText(
-    'Beanfriend wants to date Ghostine, \n' <<
-    'but her ghouls does not welcome him.', 50, true
-  )
-  
-  with tr(5) clear!
-  
-  with tr(2) fn() bottomText.typeOutText(
-    'After some warm-up training with Ghostine, \n' << 
-    'Beanfriend has a sing-off with ...', 50, true
-  )
-  
-  with tr(5) clear!
-  
-  with tr(2) fn() bottomText.typeOutText(
-    'Beanfriend, your time is now !!!', 50, true
-  )
-
-  with tr(3) fn() {
-    burp()
-  
-    speed := 1
-    rotUpd := with new(Promise) fn(res, rej) {
-      fn handleUpdate() {
-        val := speed <- (speed + (speed / 100))
-        bf.rotateBy(5 * val)
-        bf.move(speed / 10, 0)
-      }
-      with bf.onUpdate() fn {
-        if speed < 4000 {
-          true -> handleUpdate()
-          _ -> res(?)
-        }
-      }
-    }
-    
-    with rotUpd.then() fn {
-      bf.rotateTo(0)
-      Transition(WHITE).fadeIn(2)
-      with wait(3) fn() leave!()
-    }
-  }
-  
+  // Do Cutscene
+  cutsc := newCut()
+  [
+    // In
+    [0.05, fn() console.log(1)]
+    [0.05, fn() console.log(2)]
+    [0.05, fn() console.log(3)]
+  ] |> with cutsc.Cutscene() fn {}
 }
 
+fn d1continueSegment() {
+
+}
 
 fn load {
   // We also do loading during them because thats cool downtime!

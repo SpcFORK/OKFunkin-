@@ -16,11 +16,18 @@ loading_tempSpr := ?
 kaboomSpr := ?
 kaboom_bgSpr := ?
 cowingSpr := ?
-introTexts := ?
+introTexts := getData('txttxt', s('First time?\n welcome.'))
 
 menuMusic := ?
 
 // ---
+
+with load() Promise.all([
+  fetch('code/txt.txt').
+    then(fn(res) res.text()).
+    then(fn(res) setData('txttxt', s(res))).
+    then(fn() introTexts <- getData('txttxt', 'UH OHHHH!!!'))
+])
 
 with scene('initLoading') fn {
 
@@ -178,12 +185,6 @@ with scene('initLoading') fn {
     kaboomSpr: kaboomSpr
     kaboom_bgSpr: kaboom_bgSpr
   }
-
-  with load() Promise.all([
-    fetch('code/txt.txt').
-      then(fn(res) res.text()).
-      then(fn(res) introTexts <- string(res))
-  ])
 
   // ---
 

@@ -19,6 +19,7 @@ fn windowBind(fns...) {
 }
 
 windowBind(
+  windowBind
 
   // Stringify JS interop
   fn s(pl) string(pl).toString()

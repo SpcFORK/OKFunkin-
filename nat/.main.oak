@@ -144,7 +144,9 @@ gotFile := with makeOrGetFile(bJS) ''
 gotHeader := with makeOrGetFile(head) ''
 gotFooter := with makeOrGetFile(foot) ''
 
-bJS |> fs.writeFile(gotHeader + '\n\n' + gotFile + '\n\n' + gotFooter) |> std.println()
+combined := gotHeader + '\n\n' + gotFile + '\n\n' + gotFooter
+
+bJS |> fs.writeFile(combined) |> std.println()
 
 std.print(
   '\n[ OAKSri ]\n' << exec('uglifyjs', [
@@ -165,7 +167,7 @@ fn resolveHTMLBuilding(build) {
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://unpkg.com/kaboom/dist/kaboom.js"></script>
+  <script src="https://unpkg.com/kaplay/dist/kaboom.js"></script>
   <title>
     OKFunk
   </title>
@@ -193,7 +195,7 @@ fn resolveHTMLBuilding(build) {
   <script>{{ 0 }}</script>
 </body>
 </html>
-  ' |> str.trim() |> fmt.format(build)
+  ' |> str.trim() |> fmt.format(combined)
 }
 
 // ---
