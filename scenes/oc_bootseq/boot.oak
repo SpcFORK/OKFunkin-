@@ -4,7 +4,7 @@ dt := import('datetime')
 
 gwibble := loadFont(
   'gwibble' |> s()
-  '/fonts/gwibble/font.ttf' |> s()
+  'assets/fonts/gwibble/font.ttf' |> s()
 )
 
 { shakey: shakey } := import('../blocks/shakey')

@@ -46,7 +46,7 @@ std := import('std')
 
 
 bgList := [
-  'sprites/menu/kblfront.png'
+  'assets/sprites/menu/kblfront.png'
 ]
 
 

@@ -13,7 +13,7 @@ rng := import('random')
 
 ksink := loadFont(
   s('sink')
-  s('/fonts/sink/font.ttf')
+  s('assets/fonts/sink/font.ttf')
 )
 
 GLOBAL_LOADED_FILES := window.GLOBAL_LOADED_FILES := {

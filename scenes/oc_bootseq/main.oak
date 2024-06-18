@@ -13,7 +13,7 @@ std := import('std')
 
 // ---
 
-oK_ := OKloadSprite('oakcart', '/sprites/oakcart.png')
+oK_ := OKloadSprite('oakcart', 'assets/sprites/oakcart.png')
 
 _b2 := import('boot')
 

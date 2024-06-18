@@ -23,7 +23,7 @@ menuMusic := ?
 // ---
 
 with load() Promise.all([
-  fetch('code/txt.txt').
+  fetch('assets/txt.txt').
     then(fn(res) res.text()).
     then(fn(res) setData('txttxt', s(res))).
     then(fn() introTexts <- getData('txttxt', 'UH OHHHH!!!'))
@@ -67,7 +67,7 @@ with scene('initLoading') fn {
 
   gwibble := loadFont(
     'gwibble' |> s()
-    '/fonts/gwibble/font.ttf' |> s()
+    'assets/fonts/gwibble/font.ttf' |> s()
   )
 
   with AddText() gwibble |> keys()
@@ -77,7 +77,7 @@ with scene('initLoading') fn {
 
   attemptLog('bean')
   beanSpr <- with do() '
-    loadSpriteAtlas("sprites/game/characters/beanfriend.png", {
+    loadSpriteAtlas("assets/sprites/game/characters/beanfriend.png", {
       bean: {
         x: 0,
         y: 0,
@@ -104,7 +104,7 @@ with scene('initLoading') fn {
 
   attemptLog('ghosty')
   ghostySpr <- with do() '
-    loadSpriteAtlas("sprites/game/characters/Ghosty.png", {
+    loadSpriteAtlas("assets/sprites/game/characters/Ghosty.png", {
       ghosty: {
         x: 0,
         y: 0,
@@ -155,24 +155,24 @@ with scene('initLoading') fn {
     returns
   }
 
-  menu_logoSpr <- lspr('menu_logo', 'sprites/menu/menu.png')
-  loadBarSpr <- lspr('loadBar', 'sprites/loadBar.png')
-  loading_tempSpr <- lspr('loading_temp', 'sprites/menu/kblfront.png')
+  menu_logoSpr <- lspr('menu_logo', 'assets/sprites/menu/menu.png')
+  loadBarSpr <- lspr('loadBar', 'assets/sprites/loadBar.png')
+  loading_tempSpr <- lspr('loading_temp', 'assets/sprites/menu/kblfront.png')
 
-  kaboomSpr <- lspr('kaboom', 'sprites/ka.png')
+  kaboomSpr <- lspr('kaboom', 'assets/sprites/ka.png')
 
   kaboom_bgSpr := lspr(
     'kaboom_bg'
-    'sprites/boom.png'
+    'assets/sprites/boom.png'
   )
 
-  cowingSpr <- lspr('cowing', '/cowingWhite.png')
+  cowingSpr <- lspr('cowing', 'assets/cowingWhite.png')
 
-  lsnd('freakyMenu', 'sounds/freakyMenu.ogg')
+  lsnd('freakyMenu', 'assets/sounds/freakyMenu.ogg')
 
-  lsnd('confirmMenu', 'sounds/confirmMenu.ogg')
-  lsnd('cancelMenu', 'sounds/cancelMenu.ogg')
-  lsnd('scrollMenu', 'sounds/scrollMenu.ogg')
+  lsnd('confirmMenu', 'assets/sounds/confirmMenu.ogg')
+  lsnd('cancelMenu', 'assets/sounds/cancelMenu.ogg')
+  lsnd('scrollMenu', 'assets/sounds/scrollMenu.ogg')
 
   // Modders !
   window.intialLoad <- {
