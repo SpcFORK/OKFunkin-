@@ -45,6 +45,9 @@ rng := import('random')
 { shakey: shakey } := import('../../blocks/shakey')
 
 
+{ Transition: Transition } := import('../../blocks/Transition')
+
+
 with scene('menuScreen') fn {
 
   enterNextH('gameSelect')
@@ -113,5 +116,9 @@ with scene('menuScreen') fn {
     }
 
   }
+
+  // ---
+
+  Transition(WHITE).fadeOut(0.3)
 
 }

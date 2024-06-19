@@ -43,9 +43,9 @@ with scene('init__') fn {
   ])
 
   fn SET(v) cn_title_text.opacity <- v
+  fn TEXT(v) cn_title_text.text <- v
   fn SHOW SET(1)
   fn HIDE SET(0)
-  fn TEXT(v) cn_title_text.text <- v
   
   shakey(cn_title_text)
 

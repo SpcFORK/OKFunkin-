@@ -167,4 +167,6 @@ with scene('gameSelect') fn {
     with wait(0.2) weekCall
   }
 
+  Transition(BLACK).fadeOut(0.2)
+
 }

@@ -1,1 +1,7 @@
 ml := import('ml')
+weekmaster := import('weekmaster')
+
+window.GAMEPARTS := {
+  ml: ml
+  weekmaster: weekmaster
+}

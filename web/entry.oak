@@ -4,6 +4,7 @@ json := import('json')
 fmt := import('fmt')
 path := import('path')
 
+// https://unpkg.com/kapcacher@0.2.5/kapcache.js
 oaka := import('oaka')
 
 // ---
@@ -14,7 +15,8 @@ h! := 500
 globalThis.k := kaboom({
   width: 600
   height: 500
-  scale: w! / h!
+  scale: w! / h!,
+  plugins: [KapCacher.CacherPlugin]
 })
 
 vv := visualViewport
@@ -52,8 +54,6 @@ addEventListener('resize', updateCanvas)
 addEventListener('scroll', updateCanvas)
 addEventListener('orientationchange', updateCanvas)
 document.addEventListener('fullscreenchange', updateCanvas)
-
-
 
 // ---
 

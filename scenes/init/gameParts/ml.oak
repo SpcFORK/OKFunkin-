@@ -10,18 +10,18 @@ fn MLtoSObj(htmlStr, type) {
   fn parseNode(node) {
     result := {}
 
+    with std.each(node.attributes) fn(ii) if ii != ? -> result.(ii.name) <- ii.value
+
     fn handleNoChildren if node.attributes.length > 0 {
-      with std.each(node.attributes) fn(ii) if ii != ? -> result.(ii.name) <- ii.value
-      
       true -> result.'__text' <- node.textContent
       _ -> result <- node.textContent |> std.default('')
     }
-    
+
     if node.children.length = ? | node.children.length <= 0 {
       true -> handleNoChildren()
       _ -> with std.each(node.children) fn(ii) result.(ii.localName) <- parseNode(ii)
     }
-    
+
     result
   }
 

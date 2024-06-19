@@ -1,0 +1,167 @@
+{ MLtoSObj: MLtoSObj } := import('ml')
+
+fn weekByName(c) {
+  'weekLevels/mlp/' << c
+}
+
+fn getWeeksXML() {
+  // Weeks.xml isnb't a folder, but in there  so this okay
+  weekByName('weeks.xml')
+}
+
+fn getWeekAsset(weekName, c) {
+  weekByName(weekName) << '/' << c
+}
+
+fn getWeekXML(weekName) {
+  getWeekAsset(weekName, 'main.xml')
+}
+
+fn getWeekSong(weekName, c) {
+  getWeekAsset(weekName, 'songs/') << c
+}
+
+fn getSongAsset(weekName, songName, c) {
+  getWeekSong(weekName, songName) << '/' << c
+}
+
+fn getSongXML(weekName, c) {
+  getSongAsset(weekName, c, 'song.xml')
+}
+
+fn getChartXML(weekName, c) {
+  getSongAsset(weekName, c, 'chart.xml')
+}
+
+fn getWeekSprite(weekName, c) {
+  getWeekAsset(weekName, 'sprites/') << c
+}
+
+fn fetchWeekXML(weekName) {
+  weekPath := getWeekXML(weekName)
+  fetch(weekPath)
+}
+
+fn handleMLFormat(r) MLtoSObj(r, 'text/xml')
+fn handleMLText(r) r.text()
+
+fn parseWeekXML(weekName) {
+  resText := with fetchWeekXML(weekName).
+    then() handleMLText
+  
+  with resText.
+    then() handleMLFormat
+}
+
+fn propagateWeek(weekData) {
+  newWeek := weekData |> Object()
+
+  songs := Object.entries(newWeek.songs)
+
+  root := ''
+  promArr := []
+  fn pPush(i) promArr.push(i)
+
+  fn handleUrl(k, n) {
+    SONGROLL_DATA := with rolloutSongUrl(n).
+      then() fn(d) newWeek.songs.(k) <- d
+
+    pPush(SONGROLL_DATA)
+  }
+
+  with songs.forEach() fn(e, i) {
+    [kName, assetUrl] := e
+
+    if kName = 'root' {
+      ASSET_URL := root + assetUrl
+      
+      true -> root <- assetUrl
+      _ -> handleUrl(kName, ASSET_URL)
+    }
+  }
+
+  with Promise.all(promArr).then() fn() newWeek
+}
+
+fn fetchSongXML(weekName, songName) {
+  songPath := getSongXML(weekName, songName)
+  fetch(songPath)
+}
+
+fn parseSongXML(weekName, songName) {
+  resText := with fetchSongXML(weekName, songName).
+    then() fn(r) handleMLText
+
+  with resText.
+    then() handleMLFormat
+}
+
+fn parseSongXURL(songUrl) {
+  resText := with fetch(songUrl).
+    then() handleMLText
+
+  with resText.
+    then() handleMLFormat
+}
+
+fn parseSongEntries(song, v, i) {
+  [key, val] := v
+
+  v
+}
+
+fn parseSongPreload(song, v, i) {
+  [key, val] := v
+
+  v
+}
+
+fn parseSongPlaybacks(song, v, i) {
+  [key, val] := v
+
+  v
+}
+
+fn propagateSong(songData) {
+  newSong := songData |> Object()
+
+  entries := Object.entries(songData.entry)
+  preload := Object.entries(songData.preload)
+  playbacks := Object.entries(songData.playbacks)
+
+  root := ''
+  promArr := []
+  fn pPush(i...) promArr.push(i...)
+
+  fn passSong(cb) fn(args...) cb(newSong, args...)
+
+  entries <- with entries.map() passSong(parseSongEntries)
+  preload <- with preload.map() passSong(parseSongPreload)
+  playbacks <- with playbacks.map() passSong(parseSongPlaybacks)
+
+  pPush(
+    entries...
+  )
+  
+  pPush(
+    preload...
+  )
+  
+  pPush(
+    playbacks...
+  )
+
+  with Promise.all(promArr).then() fn() newSong
+}
+
+fn rolloutSongUrl(songUrl) {
+  data := parseSongXURL(songUrl)
+  with data.then() propagateSong
+}
+
+fn rolloutWeek(weekName) {
+  data := parseWeekXML(weekName)
+  with data.then() propagateWeek
+}
+
+with rolloutWeek('EmptyWeek').then() console.log

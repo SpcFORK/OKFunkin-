@@ -41,6 +41,7 @@ with scene('credits') fn {
 
   creditStr := 
     'SpectCOW (SpcFORK), Creator of KaboomFunkin.\n' <<
+    'NiceEli, JS/TS inject, LDTK Charts.\n' <<
     'Thanks for playing!'
 
   with add() [
