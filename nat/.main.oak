@@ -168,7 +168,6 @@ fn resolveHTMLBuilding(build) {
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://unpkg.com/kaplay/dist/kaboom.js"></script>
-  <script src="https://unpkg.com/kapcacher@0.3.0/kapcache.js" type="module"></script>
   <title>
     OKFunk
   </title>
@@ -192,8 +191,9 @@ fn resolveHTMLBuilding(build) {
 
 </head>
 <body>
-  <script async="async" type="module">{{ 0 }}</script>
   <script src="JS/exports.js" type="module"></script>
+  <script src="https://unpkg.com/kapcacher@0.3.0/kapcache.js" type="module" async="async"></script>
+  <script async="async">{{ 0 }}</script>
 </body>
 </html>
   ' |> str.trim() |> fmt.format(combined)
