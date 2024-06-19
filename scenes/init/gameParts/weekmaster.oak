@@ -163,5 +163,3 @@ fn rolloutWeek(weekName) {
   data := parseWeekXML(weekName)
   with data.then() propagateWeek
 }
-
-with rolloutWeek('EmptyWeek').then() console.log
