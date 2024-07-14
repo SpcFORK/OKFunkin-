@@ -1,0 +1,137 @@
+fn addArrowBar(x, y, inv, extra...) {
+  bar := with add() [
+    pos(x, y)
+  ].concat(extra)
+
+  arrows := []
+  wh := 40
+  padRatio := 4
+
+  fn getPad() wh / padRatio
+  fn getP() arrows.length * (wh + getPad())
+  fn getTotalW() ((wh / 2) + getP()) * inv
+  fn sizeOf() getP() + wh
+
+  fn tryForeign(c, args) try(fn() c(args))
+  
+  fn makeArrow {
+    arrow := with bar.add() [
+      'Arrow' |> s()
+      area()
+      rect(wh, wh)
+      anchor('center' |> s())
+
+      pos(getTotalW(), wh / 2)
+      {
+        self: arrow
+        noteTrack: []
+
+        ON_STATE: ON_STATE := :on
+        OFF_STATE: OFF_STATE := :off
+        state: OFF_STATE
+
+        defColor: WHITE
+        pshColor: RED
+
+        idleEvents: []
+        clickEvents: []
+        enterEvents: []
+        leaveEvents: []
+
+        STATE_CHANGE_TIME: 0
+        updateSCT: fn() arrow.STATE_CHANGE_TIME <- time()
+
+        press: fn {
+          arrow.state <- ON_STATE
+          arrow.updateSCT()
+        }
+
+        unpress: fn {
+          arrow.state <- OFF_STATE
+          arrow.updateSCT()
+        }
+
+        getState: fn() arrow.state
+      }
+    ]
+
+    arrow.updateColor := fn if arrow.getState() {
+      fn useCol(c) with arrow.use() color(c)
+      :off -> useCol(arrow.defColor)
+      :on -> useCol(arrow.pshColor)
+    }
+
+    fn tryEventStack(es, args) with es.forEach() fn(c) tryForeign(c, args)
+
+    with arrow.onCollide('Note' |> s()) fn(n) {
+      tryEventStack(arrow.enterEvents, n)
+    }
+
+    with arrow.onCollideEnd('Note' |> s()) fn(n) {
+      tryEventStack(arrow.leaveEvents, n)
+    }
+
+    with arrow.onCollideUpdate('Note' |> s()) fn(n) {
+      if n.isColliding(arrow) -> if arrow.state {
+        fn doCollide(p) tryEventStack(p, n)
+        :on -> doCollide(arrow.clickEvents)
+        :off -> doCollide(arrow.idleEvents)
+      } 
+    }
+
+    arrow.makeNote := fn(offset) {
+      note := with arrow.add() [
+        'Note' |> s()
+        area()
+        rect(wh, wh)
+        anchor('center' |> s())
+
+        pos(0, offset)
+        {
+          Pressed?: false
+          Missed?: false
+        }
+      ]
+
+      arrow.noteTrack.push(note)
+      note
+    }
+
+    arrow
+  }
+
+  fn stepColors with arrows.forEach() fn(a) {
+    a.updateColor()
+  }
+
+  fn stepArrows(TRACK_SPEED) with arrows.forEach() fn(a) {
+    with a.noteTrack.forEach() fn(nt) {
+      nt.move(0, TRACK_SPEED)
+    }
+  }
+
+  fn addArrow() with arrows.push() makeArrow()
+  fn addArrows(r) with std.loop(r) fn() addArrow()
+
+  addArrows(4)
+
+  {
+    bar: bar
+
+    wh: wh
+    sizeOf: sizeOf
+
+    makeArrow: makeArrow
+    addArrow: addArrow
+
+    arrows: arrowsCB! := fn() arrows
+    withAllArrows: fn(cb) arrowsCB!().forEach(cb)
+
+    stepArrows: stepArrows
+    stepColors: stepColors
+    trackNote!: fn(i, o) arrowsCB!().(i).makeNote(o)
+
+    padRatio: padRatio
+    setPadRatio: fn(a) padRatio <- a
+  }
+}

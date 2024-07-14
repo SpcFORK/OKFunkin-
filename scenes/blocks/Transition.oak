@@ -17,9 +17,7 @@ fn Transition(color_, tw) {
 
   self.tr <- createFG()
 
-  fn fadeOut(sp) {
-    self.tr.fadeOut(sp)
-  }
+  fn fadeOut(sp) self.tr.fadeOut(sp)
 
   self.fadeIn := fn(speed, color) {
     if color != ? -> self.tr.use(color)
@@ -28,7 +26,7 @@ fn Transition(color_, tw) {
 
   self.fadeOut := fn(speed, color) {
     if color != ? -> self.tr.use(color)
-    self.tr.fadeOut(speed)
+    fadeOut(speed)
   }
 
   self

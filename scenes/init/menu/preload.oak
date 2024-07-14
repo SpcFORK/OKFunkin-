@@ -86,12 +86,24 @@ with scene('initLoading') fn {
         sliceX: 5,
         sliceY: 5,
         anims: {
-          none: { from: 0, to: 0, loop: true, },
+          none: 0,
           idle: { from: 0, to: 4, loop: true },
+
+          ileft: 5,
           left: { from: 5, to: 8, loop: false },
+          hleft: { from: 5, to: 6, loop: true },
+
+          idown: 9,
           down: { from: 9, to: 12, loop: false },
+          hdown: { from: 9, to: 10, loop: true },
+
+          iup: 13,
           up: { from: 13, to: 16, loop: false },
+          hup: { from: 13, to: 14, loop: true },
+
+          iright: 17,
           right: { from: 17, to: 20, loop: false },
+          hright: { from: 17, to: 18, loop: true },
         },
       }
     })
@@ -118,11 +130,35 @@ with scene('initLoading') fn {
       }
     })
   '
+  
 
   with AddText() ghostySpr |> keys()
   AddText('')
 
   sucLog('ghosty')
+  
+  attemptLog('speaker')
+  speakerSpr <- with do() '
+    loadSpriteAtlas("assets/sprites/speaker.png", {
+      speaker: {
+        x: 0,
+        y: 0,
+        width: 120 * 3,
+        height: 90,
+        sliceX: 3,
+        anims: {
+          none: { from: 0, to: 0, loop: true, },
+          loop: { from: 0, to: 2, loop: true },
+          beat: { from: 0, to: 2, loop: false },
+        }
+      }
+    })
+  '
+
+  with AddText() speakerSpr |> keys()
+  AddText('')
+
+  sucLog('speaker')
 
   fn lspr(name, path) {
     id := 'sprite:' << name
@@ -178,6 +214,7 @@ with scene('initLoading') fn {
   window.intialLoad <- {
     gwibble: gwibble
     beanSpr: beanSpr
+    speakerSpr: speakerSpr
     ghostySpr: ghostySpr
     menu_logoSpr: menu_logoSpr
     loadBarSpr: loadBarSpr

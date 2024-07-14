@@ -1,4 +1,40 @@
 std := import('std')
+fmt := import('fmt')
+math := import('math')
+
+{
+  FirstInput?: FirstInput?
+  IS_IFRAME: IS_IFRAME
+  CHROMEOS: CHROMEOS
+
+  SUPERCOMMONCOLOUR: SUPERCOMMONCOLOUR
+  createBeatHandler: createBeatHandler
+
+  getFInput: getFInput
+  enterNextH: enterNextH
+
+  playMenuEnter: playMenuEnter
+  MEnterTrigger: MEnterTrigger
+
+  currentAudio: currentAudio
+
+  playMenuEnter: playMenuEnter
+  stopConfirm: stopConfirm
+  MEnterTrigger: MEnterTrigger
+
+  playMenuMusic: playMenuMusic
+  stopMenuMusic: stopMenuMusic
+
+  playTickSound: playTickSound
+  stopTickSound: stopTickSound
+
+  createPlayer: createPlayer
+  createGhosty: createGhosty
+
+  createMenuStructure: createMenuStructure
+  ScrollableMenu: ScrollableMenu
+  ScrollableList: ScrollableList
+} := import('core')
 
 
 {
@@ -11,7 +47,294 @@ GameParts := import('./gameParts/all')
 
 // ----
 
+binds := [
+  'g'
+  'h'
+  'l'
+  ';'
+]
 
 with scene('songGame') fn {
+  // Actual game is oddly spaced so you don't have to look far
+  p1 := GameParts.arrows.addArrowBar(60, 30, 1)
+  p2 := GameParts.arrows.addArrowBar(width() - 30, 30, -1, anchor('topleft' |> s()))
+
+  fn sideState {{
+    stp: true
+    clr: true
+    score: 0
+    misses: 0
+    acc: 0
+    combo: 0
+    combo_max: 0
+    numOfNotes: 0
+    health: 100
+  }}
+
+  bf := createPlayer()
+  bf.pos.x <- 130
+  bf.pos.y <- center().y + 100
+
+  bpm := 60
+  fn speedv() bpm / 60 / dt()
+  
+  p1.bcont := sideState()
+  p2.bcont := sideState()
+  [lf, rt] := [p1.bcont, p2.bcont]
+
+  scoreText := with add() [
+    with text('0 Points 0 Misses 0% Acc' |> s()) {
+      size: 15
+      font: 'arial' |> s()
+    }
+    pos({
+      c := center()
+      c.add(0, c.y * 0.85)
+    })
+    anchor('center' |> s())
+
+    // fns
+    {
+      scoreFmt: (
+        '{{ 0 }} Points  ' <<
+        '{{ 1 }} Misses  ' <<
+        '{{ 2 }}% Accuracy'
+      )
+
+      makeScoreText: fn(side) scoreText.scoreFmt |> fmt.format(
+        side.bcont.score
+        side.bcont.misses
+        side.bcont.acc
+      )
+
+      updateScore: fn(side) scoreText.text <- scoreText.makeScoreText(side)
+    }
+  ]
+
+  fn makeBinds(a, i) {
+    key := binds.(i) |> s()
+    key |> onKeyPress(fn {
+      a.press()
+    })
+    key |> onKeyRelease(fn {
+      a.unpress()
+    })
+  }
+
+  fn initBar!(a, b, i) {
+    makeBinds(a, i)
+
+    fn transformText(idx, ch) {{
+      pos: vec2(0, wave(-4, 4, time() * 4 + idx * 1.5))
+      angle: wave(-9, 9, time() * 3 + idx)
+    }}
+
+    fn makeComboArea with add() [
+      with text(b.bcont.combo |> s()) {
+        size: 24
+        transform: transformText
+      }
+      pos(center())
+      anchor('center' |> s())
+      opacity(1)
+    ]
+    
+    fn makeRatingArea with add() [
+      // TODO
+      // sprite
+      with text('...' |> s()) {
+        size: 30
+        transform: transformText
+      }
+      pos(center())
+      anchor('center' |> s())
+      opacity(1)
+    ]
+
+    fn doComboDisplay(o, my, ly) {
+      SPEED := 3
+
+      upTween := tween(
+        o.pos
+        vec2(0, my) |> o.pos.add()
+        SPEED
+        fn(v) o.pos <- v
+        easings.easeOutQuad
+      )
+
+      downTween := with upTween.then() fn() tween(
+        o.pos
+        vec2(0, ly) |> o.pos.add()
+        SPEED
+        fn(v) o.pos <- v
+        easings.easeInQuad
+      )
+
+      fadeTween := with upTween.then() fn() tween(
+        o.opacity
+        0
+        SPEED
+        fn(v) o.opacity <- v
+        easings.easeOutSine
+      )
+
+      with wait(SPEED * 2) fn {
+        o.destroy()
+      }
+    }
+
+    // Ratings
+    //
+    // Dst is in Vec2 units
+    //
+    // 0         0px
+    // Nowhere   0.2px
+    // Emperor   0.5px
+    // King      1px
+    // Absolute  1px
+    // Godly     5px
+    // Perfect   10px
+    // Wow       15px
+    // Sick      20px
+    // Cool      40px
+    // Great     80px
+    // Okay      160px
+    // Bad       320px
+    // Shit      more
+    //
+    fn handleRatings(note, dst) if {
+      fn addNoteRating(r) note.Rating? <- r
+      dst <= 0 -> debug.log(-3)
+      dst <= 0.2 -> debug.log(-2)
+      dst <= 0.5 -> debug.log(-1)
+      dst <= 1 -> debug.log(0)
+      dst <= 5 -> debug.log(1)
+      dst <= 10 -> debug.log(2)
+      dst <= 15 -> debug.log(3)
+      dst <= 20 -> debug.log(4)
+      dst <= 40 -> debug.log(5)
+      dst <= 80 -> debug.log(6)
+      dst <= 160 -> debug.log(7)
+      dst <= 320 -> debug.log(8)
+      _ -> debug.log(9)
+    }
+
+    fn handleAcc(note, dst) {
+      mult := Math.abs((a.height / 2) - dst) + 1
+      b.bcont.score <- b.bcont.score + math.round(100 * mult)
+      scoreText.updateScore(b)
+      debug.log(mult)
+    }
+
+    fn handleNoteClickDist(note) {
+      dst := note.pos.dist(0, a.pos.y)
+      handleRatings(note, dst)
+      handleAcc(note, dst)
+    }
+
+    fn handleComboAdd(note) {
+      b.bcont.combo <- b.bcont.combo + 1
+    }
+
+    fn handleComboDisplay(note) if b.bcont.combo {
+      ?, 0 -> {}
+      _ -> doComboDisplay(makeComboArea(), -60, 90)
+    }
+
+    fn handleCombo(note) {
+      handleComboAdd(note)
+      handleComboDisplay(note)
+    }
+
+    fn clickNote(note) {
+      note.numOfNotes <- note.numOfNotes + 1
+
+      handleNoteClickDist(note)
+      handleCombo(note)
+
+      note.Pressed? <- true
+      note.Missed? <- false
+      note.destroy()
+    }
+
+    with a.clickEvents.push() fn(note) {
+      t := time()
+      if ((t - a.STATE_CHANGE_TIME) < 0.1) & (! note.Missed?) -> clickNote(note)
+    }
+
+    fn handleMiss(note) {
+      b.bcont.misses <- b.bcont.misses + 1
+      note.Missed? <- true
+      note.Pressed? <- false
+      note.destroy()
+      scoreText.updateScore(b)
+    }
+
+    with a.leaveEvents.push() fn(note) {
+      if (! note.Pressed?) & (! note.Missed?) -> handleMiss(note)
+    }
+
+    a.TRACK_ON <- true
+  }
+
+  fn begin! {
+
+    fn embedInit(p) fn(a, i) initBar!(a, p, i)
+    p1.withAllArrows(embedInit(p1))
+    p2.withAllArrows(embedInit(p1))
+
+    fn stepFlag(cb, f) if f -> cb()
+    fn stepStep(p) fn() p.stepArrows(-speedv())
+
+    fn stepArrows(p, f) stepStep(p) |> stepFlag(f.stp)
+    fn stepColors(p, f) p.stepColors |> stepFlag(f.clr)
+
+    sides := [
+      [p1, lf]
+      [p2, rt]
+    ]
+
+    cbs := [
+      stepArrows
+      stepColors
+    ]
+
+    with onUpdate() fn with sides.forEach() fn(e) {
+      with cbs.forEach() fn(cb) cb(e...)
+    }
+  }
+
+  centerText := with add() [
+    with text('0' |> s()) {
+      size: 30
+    }
+    pos(center())
+    anchor('center' |> s())
+  ]
+
+  fn doStartSeq(v, cb) {
+    centerText.text <- s(v)
+
+    fn handleFalse {
+      cb()
+      centerText.destroy()
+    }
+
+    fn handleTrue with wait(1) fn() doStartSeq(v - 1, cb)
+
+    if v > 0 {
+      true -> handleTrue()
+      false -> handleFalse()
+    }
+  }
+
+  // Load chart
+
+  p1.trackNote!(1, 300)
+  p1.trackNote!(2, 600)
+  p1.trackNote!(0, 600)
+  p1.trackNote!(3, 1700)
+
+  doStartSeq(3, begin!)
 
 }

@@ -1,7 +1,9 @@
 ml := import('ml')
 weekmaster := import('weekmaster')
+arrows := import('arrows')
 
 window.GAMEPARTS := {
   ml: ml
   weekmaster: weekmaster
+  arrows: arrows
 }

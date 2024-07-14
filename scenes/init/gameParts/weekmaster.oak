@@ -104,24 +104,6 @@ fn parseSongXURL(songUrl) {
     then() handleMLFormat
 }
 
-fn parseSongEntries(song, v, i) {
-  [key, val] := v
-
-  v
-}
-
-fn parseSongPreload(song, v, i) {
-  [key, val] := v
-
-  v
-}
-
-fn parseSongPlaybacks(song, v, i) {
-  [key, val] := v
-
-  v
-}
-
 fn propagateSong(songData) {
   newSong := songData |> Object()
 
@@ -133,10 +115,47 @@ fn propagateSong(songData) {
   promArr := []
   fn pPush(i...) promArr.push(i...)
 
+  fn addRoot(st) root + st
+
+  fn handleStringEnt(k, v) {
+    
+  }
+  
+  fn handleObjEnt(k, v) {
+  
+  }
+
+  fn parseSongEntries(song, v, i) {
+    [key, val] := v
+
+    if type(val) = 'string' {
+      true -> handleStringEnt(key, val)
+      _ -> handleObjEnt(key, val)
+    }
+
+    v
+  }
+
+  fn parseSongPreload(song, v, i) {
+    [key, val] := v
+
+    v
+  }
+
+  fn parseSongPlaybacks(song, v, i) {
+    [key, val] := v
+
+    v
+  }
+
   fn passSong(cb) fn(args...) cb(newSong, args...)
 
   entries <- with entries.map() passSong(parseSongEntries)
+  root <- ''
+  
   preload <- with preload.map() passSong(parseSongPreload)
+  root <- ''
+  
   playbacks <- with playbacks.map() passSong(parseSongPlaybacks)
 
   pPush(

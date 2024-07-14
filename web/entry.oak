@@ -9,6 +9,8 @@ oaka := import('oaka')
 
 // ---
 
+window.hasKPC := globalThis.KapCacher != ?
+
 w! := 600
 h! := 500
 
@@ -16,7 +18,7 @@ globalThis.k := kaboom({
   width: 600
   height: 500
   scale: w! / h!,
-  plugins: [KapCacher.CacherPlugin]
+  plugins: if globalThis.KapCacher -> KapCacher?.CacherPlugin
 })
 
 vv := visualViewport

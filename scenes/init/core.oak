@@ -54,32 +54,22 @@ fn createBeatHandler {
 
 fn createPlayer() {
   with add() [
-    sprite(s('bean'), {
+    with sprite('bean' |> s()) {
       anim: 'idle' |> s()
-    })
+    }
     pos(center())
     area()
     body()
     with anchor() 'center' |> s()
-    {
-      score: 0
-      misses: 0
-      combo: 0
-      combo_max: 0
-      health: 100
-    }
   ]
 }
 
 fn createGhosty() {
   with add() [
-    sprite(
-      s('ghosty')
-      {
-        anim: s('idle')
-        animSpeed: 0.5
-      }
-    )
+    with sprite('ghosty' |> s()) {
+      anim: s('idle')
+      animSpeed: 0.5
+    }
     with anchor() 'center' |> s()
     pos(center())
   ]

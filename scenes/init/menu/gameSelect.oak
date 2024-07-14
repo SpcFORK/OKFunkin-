@@ -87,10 +87,20 @@ with scene('gameSelect') fn {
   // ---
 
   bf := createPlayer()
+  speaks := add([
+    s('speaker')
+    do(' sprite("speaker", { anim: "loop" }) ')
+    do(' anchor("center") ')
+    pos(center().x, center().y - 120)
+    scale(2.1)
+  ])
   gf := createGhosty()
 
-  with bf.use() pos(100, center().y - 75)
-  with gf.use() pos(center().x, center().y - 75)
+  bf.pos.x <- 100
+  bf.pos.y <- center().y - 40
+
+  gf.pos.y <- center().x
+  gf.pos.y <- center().y - 10
 
   // ---
 

@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "ts-compile": "cd ./src && npx webpack && cd ..",
-    "test": "npm run ts-compile && node ./JS/exports.js test",
-    "dev": "npm run ts-compile && oak nat/.main.oak",
-    "build": "npm run ts-compile && oak nat/.build.oak",
-    "serve": "npm run ts-compile && oak nat/.serve.oak"
+    "ts-compile": "cd ./src && npx webpack && cd ../",
+    "test": "pnpm run ts-compile && node ./JS/exports.js test",
+    "dev": "pnpm run ts-compile && oak nat/.main.oak",
+    "build": "pnpm run ts-compile && oak nat/.build.oak",
+    "serve": "pnpm run ts-compile && oak nat/.serve.oak"
   },
   "keywords": [],
   "author": "",

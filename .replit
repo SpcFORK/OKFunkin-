@@ -4,7 +4,7 @@ onBoot = "chmod +x .config/bin/oak"
 
 entrypoint = "web/entry.oak"
 # run = "oak nat/.main.oak"
-run = "npm run dev; npm run dev"
+run = "pnpm run dev"
 modules = ["nodejs-20:v8-20230920-bd784b9"]
 
 [nix]
