@@ -5,7 +5,6 @@ str := import('str')
 json := import('json')
 rng := import('random')
 
-
 {
   FirstInput?: FirstInput?
   IS_IFRAME: IS_IFRAME
@@ -55,6 +54,22 @@ fn leave!() go('loading', {
   cb: fn() Promise |> with new() fn(r) r()
 })
 
+
+WeekTexts := [
+  'Daddy Dearest'
+  'A unique storyline, Kaboom themed'
+]
+
+enteredBefore := 0
+fn load {
+  // We also do loading during them because thats cool downtime!
+  if enteredBefore = 0 {
+    true -> go('cutscene_d_1')
+    false -> leave!()
+  }
+
+  enteredBefore <- enteredBefore + 1
+}
 
 with scene('cutscene_d_1') fn {
   stopMenuMusic()
@@ -154,16 +169,4 @@ with scene('cutscene_d_1') fn {
     }
   }
   
-}
-
-
-enteredBefore := 0
-fn load {
-  // We also do loading during them because thats cool downtime!
-  if enteredBefore = 0 {
-    true -> go('cutscene_d_1')
-    false -> leave!()
-  }
-
-  enteredBefore <- enteredBefore + 1
 }

@@ -51,6 +51,12 @@ rng := import('random')
 { shakey: shakey } := import('../../../blocks/shakey')
 
 
+WeekTexts := [
+  'Daddy Dearest'
+  'A unique storyline, Kaboom themed'
+]
+
+
 fn load {
   fn leave!() go('loading', {
     cb: fn {

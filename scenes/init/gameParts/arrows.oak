@@ -1,7 +1,12 @@
-fn addArrowBar(x, y, inv, extra...) {
-  bar := with add() [
+fn addArrowBar(p?, x, y, inv, extra...) {
+  comps := [
     pos(x, y)
   ].concat(extra)
+  
+  bar := if p? {
+    ? -> add(comps)
+    _ -> p?.add(comps)
+  }
 
   arrows := []
   wh := 40

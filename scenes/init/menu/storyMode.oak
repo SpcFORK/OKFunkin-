@@ -54,6 +54,8 @@ rng := import('random')
 // ---
 // @Weekloaders
 
+WeekImport := import('weekLoading/all')
+
 {
   week1: week1
   week2: week2
@@ -63,7 +65,11 @@ rng := import('random')
   week6: week6
   week7: week7
   week8: week8
-} := import('weekLoading/all')
+} := WeekImport
+
+WeekImportKeys := with new(Array, 8).
+  fill('week' |> s()).
+  map() fn(v, i) v + (i + 1)
 
 // ---
 // @Storymode
@@ -80,17 +86,26 @@ StoryWeeks := {
   'Week 8': week8.load
 }
 
-WeekNames := []
-// num + 1  weeks then next stop
-with std.loop(StoryWeeks |> len() + 1) fn(ic) {
-  WeekNames << ('Week ' + s(ic))
-}
+WeekNames := StoryWeeks |> keys()
 
 // @Modder  exposed
 window.StoryWeeks := {
   get: fn() StoryWeeks
   set: fn(k, x) StoryWeeks.(k) <- x
 }
+
+// ---
+
+WeekTexts := {}
+with WeekNames.forEach() fn(weekName, i) {
+  wkt := WeekImport.(WeekImportKeys.(i)).WeekTexts
+  WeekTexts.(weekName) <- if wkt {
+    ? -> ['err', 'Whaaaa?']
+    _ -> wkt
+  }
+}
+
+window.WeekTexts := WeekTexts
 
 // ---
 
@@ -133,48 +148,6 @@ with scene('storyMode') fn {
   // ---
 
   Weeks := StoryWeeks
-
-  WeekTexts := {
-    WeekNames.1: [
-      'Daddy Dearest'
-      'A unique storyline, Kaboom themed'
-    ]
-
-    WeekNames.2: [
-      'The Spookies'
-      'Your old friend, Freeplay.'
-    ]
-
-    WeekNames.3: [
-      'Pico'
-      'Change how your game works'
-    ]
-
-    WeekNames.4: [
-      'Mommy Mearest'
-      'The credits, thank the ones in it!'
-    ]
-
-    WeekNames.5: [
-      'Christmas'
-      'Quit the game, boooring.'
-    ]
-
-    WeekNames.6: [
-      'Senpai'
-      'Quit the game, boooring.'
-    ]
-
-    WeekNames.7: [
-      'Tankman'
-      'Quit the game, boooring.'
-    ]
-
-    WeekNames.8: [
-      'WeekEnd 1'
-      'Quit the game, boooring.'
-    ]
-  }
 
   sm := ScrollableMenu(Weeks)
 

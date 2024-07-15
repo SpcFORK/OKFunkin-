@@ -87,6 +87,7 @@ with scene('initLoading') fn {
         sliceY: 5,
         anims: {
           none: 0,
+          idle1: { from: 0, to: 4, loop: false },
           idle: { from: 0, to: 4, loop: true },
 
           ileft: 5,

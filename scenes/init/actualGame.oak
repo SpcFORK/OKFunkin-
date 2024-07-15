@@ -44,6 +44,7 @@ math := import('math')
 
 GameParts := import('./gameParts/all')
 
+{ makeParallax: makeParallax } := GameParts.parallax
 
 // ----
 
@@ -55,9 +56,19 @@ binds := [
 ]
 
 with scene('songGame') fn {
+  w! := width()
+  h! := width()
+  hw! := w! / 2
+  hh! := h! / 2
+
+  baseParallax := with makeParallax(?, 1, 1) [
+    pos(center())
+  ]
+
   // Actual game is oddly spaced so you don't have to look far
-  p1 := GameParts.arrows.addArrowBar(60, 30, 1)
-  p2 := GameParts.arrows.addArrowBar(width() - 30, 30, -1, anchor('topleft' |> s()))
+  barHeight := -hh! + 75
+  p1 := GameParts.arrows.addArrowBar(baseParallax, 60 - hw!, barHeight, 1)
+  p2 := GameParts.arrows.addArrowBar(baseParallax, hw! - 30, barHeight, -1, anchor('topleft' |> s()))
 
   fn sideState {{
     stp: true
@@ -77,20 +88,23 @@ with scene('songGame') fn {
 
   bpm := 60
   fn speedv() bpm / 60 / dt()
+
+  bh! := createBeatHandler()
+  with onUpdate() fn if bh!.activateBeat(bpm) = true -> {
+    baseParallax.tweenBounce(1.5, 0.2)
+    bf.play('idle1' |> s())
+  }
   
   p1.bcont := sideState()
   p2.bcont := sideState()
   [lf, rt] := [p1.bcont, p2.bcont]
 
-  scoreText := with add() [
+  scoreText := with baseParallax.add() [
     with text('0 Points 0 Misses 0% Acc' |> s()) {
       size: 15
       font: 'arial' |> s()
     }
-    pos({
-      c := center()
-      c.add(0, c.y * 0.85)
-    })
+    pos(0, hh! * 0.75)
     anchor('center' |> s())
 
     // fns
@@ -129,24 +143,24 @@ with scene('songGame') fn {
       angle: wave(-9, 9, time() * 3 + idx)
     }}
 
-    fn makeComboArea with add() [
+    fn makeComboArea with baseParallax.add() [
       with text(b.bcont.combo |> s()) {
         size: 24
         transform: transformText
       }
-      pos(center())
+      pos(0)
       anchor('center' |> s())
       opacity(1)
     ]
     
-    fn makeRatingArea with add() [
+    fn makeRatingArea with baseParallax.add() [
       // TODO
       // sprite
       with text('...' |> s()) {
         size: 30
         transform: transformText
       }
-      pos(center())
+      pos(0)
       anchor('center' |> s())
       opacity(1)
     ]
@@ -220,10 +234,23 @@ with scene('songGame') fn {
     }
 
     fn handleAcc(note, dst) {
-      mult := Math.abs((a.height / 2) - dst) + 1
+      mh := a.height / 2
+      mult := Math.abs(mh - dst) + 1
+
       b.bcont.score <- b.bcont.score + math.round(100 * mult)
+
+      highest := 100 * mh
+
       scoreText.updateScore(b)
-      debug.log(mult)
+
+      // Acc
+      normalizedDist := Math.min(1, Math.max(0, 1 - dst / mh))
+
+      accFloat := (
+        (b.bcont.acc * b.bcont.numOfNotes) + normalizedDist
+      ) / (b.bcont.numOfNotes + 1)
+
+      b.bcont.acc <- Math.round(accFloat * 100)
     }
 
     fn handleNoteClickDist(note) {
@@ -304,11 +331,11 @@ with scene('songGame') fn {
     }
   }
 
-  centerText := with add() [
+  centerText := with baseParallax.add() [
     with text('0' |> s()) {
       size: 30
     }
-    pos(center())
+    pos(0)
     anchor('center' |> s())
   ]
 

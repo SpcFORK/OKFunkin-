@@ -1,0 +1,59 @@
+fn makeParallax(p?, zi, rate, comps) {
+  extra := [
+    'Parallax' |> s()
+    'center' |> s() |> anchor()
+    z(zi)
+    scale(1)
+    {
+      Rate: rate
+      ParallaxLayers: []
+      ParentParallax: p?
+    }
+  ].concat(comps)
+
+  pl := if p? {
+    ? -> add(extra)
+    _ -> p?.add(extra)
+  }
+
+  pl.PLIndex := if p? != ? -> {
+    p?.ParallaxLayers.push(pl)
+  }
+
+  pl.moveParallax := fn(vec, deep?, ds?, p!, pRate!) {
+    ctx := p! |> std.default(pl)
+    pRate! <- pRate! |> std.default(pl.Rate)
+
+    v := vec.scale(pRate!)
+    ctx.move(v.x, v.y)
+
+    if deep? -> with ctx.ParallaxLayers.forEach() fn(v) {
+      v.moveParallax(vec, deep?, ds?, p!, if ds? {
+        ?, false -> pRate!
+        _ -> pRate! * rate
+      })
+    }
+  }
+
+  pl.bounceTween := ?
+  fn useScale(v) pl.scale <- v
+  fn ifFnshDoIt(tw) if tw != ? & tw.finish != ? -> tw.finish()
+
+  pl.tweenBounce := fn(sc, t) {
+    initial := pl.scale.clone()
+    ending := pl.scale.scale(sc)
+
+    useScale(ending)
+
+    ifFnshDoIt(pl.bounceTween)
+    pl.bounceTween <- tween(
+      ending
+      initial
+      t
+      useScale
+      easings.easeOutSine
+    )
+  }
+
+  pl
+}

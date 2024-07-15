@@ -51,6 +51,12 @@ rng := import('random')
 { shakey: shakey } := import('../../../blocks/shakey')
 
 
+WeekTexts := [
+  'The Spookies'
+  'Your old friend, Freeplay.'
+]
+
+
 fn load {
   fn leave!() go('loading', {
     cb: fn {
