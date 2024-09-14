@@ -34,7 +34,7 @@ fn Transition(color_, tw) {
 
 fn PixelTransition(color_) {
   color_ := color_ |> std.default(BLACK)
-  
+
   self := {}
 
   fn createFG {
@@ -49,7 +49,7 @@ fn PixelTransition(color_) {
 
   fn makeTransition(speed, color, amm) {
     time := 0
-    
+
     with std.loop() fn(count, breaker) if {
       self.tr.opacity < 1 -> with wait(time) fn {
         time <- time + speed
@@ -62,7 +62,7 @@ fn PixelTransition(color_) {
   
   fn unTransition(speed, color, amm) {
     time := 0
-    
+
     with std.loop() fn(count, breaker) if {
       self.tr.opacity > 0 -> with wait(time) fn {
         time <- time + speed

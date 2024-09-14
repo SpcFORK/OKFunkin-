@@ -6,7 +6,7 @@
   "scripts": {
     "ts-compile": "cd ./src && npx webpack && cd ../",
     "test": "pnpm run ts-compile && node ./JS/exports.js test",
-    "dev": "pnpm run ts-compile && oak nat/.main.oak",
+    "dev": "oak nat/.main.oak",
     "build": "pnpm run ts-compile && oak nat/.build.oak",
     "serve": "pnpm run ts-compile && oak nat/.serve.oak"
   },

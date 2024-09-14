@@ -120,7 +120,7 @@ with scene('cutscene_d_1') fn {
 
   bf.use(rotate(0))
 
-  ts := Transition(color(WHITE))
+  ts := Transition(WHITE)
   ts.fadeOut(?, 5)
 
   atrack := 0

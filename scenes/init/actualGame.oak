@@ -46,6 +46,8 @@ GameParts := import('./gameParts/all')
 
 { makeParallax: makeParallax } := GameParts.parallax
 
+mf_outline := rgb(31, 16, 42)
+
 // ----
 
 binds := [
@@ -66,7 +68,7 @@ with scene('songGame') fn {
   ]
 
   // Actual game is oddly spaced so you don't have to look far
-  barHeight := -hh! + 75
+  barHeight := -hh! + 90
   p1 := GameParts.arrows.addArrowBar(baseParallax, 60 - hw!, barHeight, 1)
   p2 := GameParts.arrows.addArrowBar(baseParallax, hw! - 30, barHeight, -1, anchor('topleft' |> s()))
 
@@ -90,11 +92,14 @@ with scene('songGame') fn {
   fn speedv() bpm / 60 / dt()
 
   bh! := createBeatHandler()
-  with onUpdate() fn if bh!.activateBeat(bpm) = true -> {
+
+  fn doBeat {
     baseParallax.tweenBounce(1.5, 0.2)
     bf.play('idle1' |> s())
   }
-  
+
+  with onUpdate() fn if bh!.activateBeat(bpm) = true -> doBeat()
+
   p1.bcont := sideState()
   p2.bcont := sideState()
   [lf, rt] := [p1.bcont, p2.bcont]
@@ -106,6 +111,7 @@ with scene('songGame') fn {
     }
     pos(0, hh! * 0.75)
     anchor('center' |> s())
+    outline(200, mf_outline)
 
     // fns
     {
@@ -151,8 +157,9 @@ with scene('songGame') fn {
       pos(0)
       anchor('center' |> s())
       opacity(1)
+      outline(200, mf_outline)
     ]
-    
+
     fn makeRatingArea with baseParallax.add() [
       // TODO
       // sprite
