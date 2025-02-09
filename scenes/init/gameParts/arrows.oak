@@ -1,8 +1,10 @@
+std := import('std')
+
 fn addArrowBar(p?, x, y, inv, extra...) {
   comps := [
     pos(x, y)
   ].concat(extra)
-  
+
   bar := if p? {
     ? -> add(comps)
     _ -> p?.add(comps)
@@ -12,23 +14,41 @@ fn addArrowBar(p?, x, y, inv, extra...) {
   wh := 40
   padRatio := 4
 
+  macro := if inv {
+    m! := [
+      [:left, rgb(11, 177, 96)]
+      [:up, rgb(255, 94, 61)]
+      [:down, rgb(162, 59, 188)]
+      [:right, rgb(213, 61, 66)]
+    ]
+
+    1 -> m!
+    -1 -> m!.reverse()
+  }
+
   fn getPad() wh / padRatio
   fn getP() arrows.length * (wh + getPad())
   fn getTotalW() ((wh / 2) + getP()) * inv
   fn sizeOf() getP() + wh
 
   fn tryForeign(c, args) try(fn() c(args))
-  
-  fn makeArrow {
+
+  fn makeArrow() {
     arrow := with bar.add() [
       'Arrow' |> s()
+
       area()
-      rect(wh, wh)
       anchor('center' |> s())
+      with rect(wh, wh) { fill: false }
 
       pos(getTotalW(), wh / 2)
       {
         self: arrow
+        macroIndex: macroIndex := arrows.length
+
+        // Turn this off if you like arrows in any lane!
+        NEEDS_MACRO_INDEX: true
+
         noteTrack: []
 
         ON_STATE: ON_STATE := :on
@@ -36,10 +56,12 @@ fn addArrowBar(p?, x, y, inv, extra...) {
         state: OFF_STATE
 
         defColor: WHITE
-        pshColor: RED
+        pshColor: macro.(macroIndex).1
 
         idleEvents: []
         clickEvents: []
+        holdEvents: []
+        holdWinEvents: []
         enterEvents: []
         leaveEvents: []
 
@@ -60,8 +82,27 @@ fn addArrowBar(p?, x, y, inv, extra...) {
       }
     ]
 
+    arrow.arrowSpr := with arrow.add() [
+      { macroIndex: macroIndex := arrow.macroIndex }
+
+      with sprite('arrows' |> s()) {
+      }
+
+      color(WHITE)
+
+      anchor('center' |> s())
+      scale(1.5)
+
+      with rotate() if macro.(macroIndex).0 {
+        :up -> 0
+        :left -> -90
+        :down -> 180
+        :right -> 90
+      }
+    ]
+
     arrow.updateColor := fn if arrow.getState() {
-      fn useCol(c) with arrow.use() color(c)
+      fn useCol(c) with arrow.arrowSpr.use() color(c)
       :off -> useCol(arrow.defColor)
       :on -> useCol(arrow.pshColor)
     }
@@ -79,22 +120,55 @@ fn addArrowBar(p?, x, y, inv, extra...) {
     with arrow.onCollideUpdate('Note' |> s()) fn(n) {
       if n.isColliding(arrow) -> if arrow.state {
         fn doCollide(p) tryEventStack(p, n)
+
+        // Handle Holding
+        n.timeHeld <- n.timeHeld + dt()
+        tryEventStack(arrow.holdEvents, n)
+        if n.holdLength < n.timeHeld -> tryEventStack(arrow.holdWinEvents, n)
+
         :on -> doCollide(arrow.clickEvents)
         :off -> doCollide(arrow.idleEvents)
       } 
     }
 
-    arrow.makeNote := fn(offset) {
+    arrow.makeNote := fn(offset, holdLength) {
+      isHoldNote := (holdLength != ?) & (holdLength > 1)
+
       note := with arrow.add() [
         'Note' |> s()
+
         area()
-        rect(wh, wh)
         anchor('center' |> s())
+        with rect(wh, wh) { fill: false }
 
         pos(0, offset)
         {
+          macroIndex: arrow.macroIndex
+          isHoldNote: isHoldNote
+          holdLength: holdLength
+          timeHeld: 0
+
           Pressed?: false
           Missed?: false
+        }
+      ]
+
+      note.noteSpr := with note.add() [
+        { macroIndex: macroIndex := note.macroIndex }
+
+        with sprite('arrows' |> s()) {
+        }
+
+        color(macro.(macroIndex).1)
+
+        anchor('center' |> s())
+        scale(1.5)
+
+        with rotate() if macro.(macroIndex).0 {
+          :up -> 0
+          :left -> -90
+          :down -> 180
+          :right -> 90
         }
       ]
 

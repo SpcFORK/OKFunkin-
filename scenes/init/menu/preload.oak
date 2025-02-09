@@ -56,7 +56,7 @@ with scene('initLoading') fn {
   AddText('Welcome to OKFunk!!!')
   AddText('')
 
-  fn log(ii) AddText('[okbf] ' << ii)
+  fn log(ii) AddText('(okbf) ' << ii)
   fn attemptLog(ii) with log() 'Attempting to load: ' << ii
   fn sucLog(ii) with log() 'Got: ' << ii
 
@@ -125,7 +125,9 @@ with scene('initLoading') fn {
         height: 80 * 2,
         sliceX: 2,
         anims: {
-          none: { from: 0, to: 0, loop: true, },
+          none: 0,
+          up: 1,
+          beat: { from: 0, to: 1 },
           idle: { from: 0, to: 1, loop: true },
         }
       }
@@ -148,7 +150,7 @@ with scene('initLoading') fn {
         height: 90,
         sliceX: 3,
         anims: {
-          none: { from: 0, to: 0, loop: true, },
+          none: 0,
           loop: { from: 0, to: 2, loop: true },
           beat: { from: 0, to: 2, loop: false },
         }
@@ -160,6 +162,31 @@ with scene('initLoading') fn {
   AddText('')
 
   sucLog('speaker')
+
+  attemptLog('arrows')
+
+  arrowsSpr <- with do() '
+    loadSpriteAtlas("assets/sprites/game/arrows.png", {
+      arrows: {
+        x: 0,
+        y: 0,
+        width: 32 * 4,
+        height: 32,
+        sliceX: 4,
+        anims: {
+          none: 0,
+          solid: 1,
+          loop: { from: 1, to: 2, loop: true },
+          leave: { from: 2, to: 3 },
+        }
+      }
+    })
+  '
+
+  with AddText() speakerSpr |> keys()
+  AddText('')
+
+  sucLog('arrows')
 
   fn lspr(name, path) {
     id := 'sprite:' << name
@@ -192,8 +219,8 @@ with scene('initLoading') fn {
     returns
   }
 
-  menu_logoSpr <- lspr('menu_logo', 'assets/sprites/menu/menu.png')
   loadBarSpr <- lspr('loadBar', 'assets/sprites/loadBar.png')
+  menu_logoSpr <- lspr('menu_logo', 'assets/sprites/menu/menu.png')
   loading_tempSpr <- lspr('loading_temp', 'assets/sprites/menu/kblfront.png')
 
   kaboomSpr <- lspr('kaboom', 'assets/sprites/ka.png')

@@ -50,22 +50,17 @@ bgList := [
 ]
 
 
-fn LoadSchema(obj, typed?) {
+fn LoadSchema(obj, typed?) if typed? {
   obj := obj |> std.default({})
 
-  if typed? {
-    ?, 'nw' -> with Object.assign({
-      type: 'basicWeek'
-      bg: '0'
-      cb: ?
-    }) obj
+  fn make(type) {{
+    type: type
+    bg: '0'
+    cb: ?
+  }}
 
-    'ns' -> with Object.assign({
-      type: 'basicSong'
-      bg: '0'
-      cb: ?
-    }) obj
-  }
+  ?, 'nw' -> with Object.assign(make('basicWeek')) obj
+  'ns' -> with Object.assign(make('basicSong')) obj
 }
 
 
@@ -134,6 +129,8 @@ with scene('loading') fn(pData, typed?) {
 
   fn afterItemLoad(loadedData, pData) {
     bar_.adjustPerc(0.4)
+
+    // add save file thing here
 
     // We will wait 0.2 to be able to see loading screen
     // yeah  its super wuick.

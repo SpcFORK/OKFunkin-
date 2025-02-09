@@ -121,7 +121,7 @@ with scene('cutscene_d_1') fn {
   bf.use(rotate(0))
 
   ts := Transition(WHITE)
-  ts.fadeOut(?, 5)
+  ts.fadeOut(5)
 
   atrack := 0
   fn tr(n, cb) if bottomText != undefined -> with wait(atrack <- atrack + n) cb
@@ -146,7 +146,7 @@ with scene('cutscene_d_1') fn {
 
   with tr(1) fn() {
     burp()
-  
+
     speed := 1
     rotUpd := with new(Promise) fn(res, rej) {
       fn handleUpdate() {

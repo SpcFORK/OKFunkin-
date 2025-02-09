@@ -36,26 +36,22 @@ fn worldify() {
 canvasPos := ?
 canvasBorder := ?
 
-document.body.style.backgroundColor := '#000'
-
-fn updateCanvas {
-  canvasPos <- worldify()
-
-  canvas.style.display <- 'flex'
-  canvas.style.position <- 'absolute'
-  canvas.style.left <- canvasPos.x |> s() + 'px'
-  canvas.style.top <- canvasPos.y |> s() + 'px'
-  canvas.style.border <- '1px solid rgba(248, 206, 86, 0.25)'
-  canvas.style.borderRadius <- '8px'
-  canvas.style.padding <- '8px'
+with Object.assign(document.body.style) {
+  overflow: 'hidden'
+  display: 'flex'
+  'background-color': '#000'
+  'justify-content': 'center'
+  'align-items': 'center'
 }
 
-updateCanvas()
-
-addEventListener('resize', updateCanvas)
-addEventListener('scroll', updateCanvas)
-addEventListener('orientationchange', updateCanvas)
-document.addEventListener('fullscreenchange', updateCanvas)
+with Object.assign(canvas.style) {
+  border: '1px solid rgba(248, 206, 86, 0.25)'
+  padding: padding := '8px'
+  width: 'auto'
+  height: 'calc(100% - {{0}} * 2)' |> fmt.format(padding)
+  'image-rendering': 'pixelated'
+  'border-radius': '8px'
+}
 
 // ---
 

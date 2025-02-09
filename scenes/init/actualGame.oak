@@ -57,7 +57,7 @@ binds := [
   ';'
 ]
 
-with scene('songGame') fn {
+with scene('songGame') fn(save, coreStuff) {
   w! := width()
   h! := width()
   hw! := w! / 2
@@ -84,50 +84,82 @@ with scene('songGame') fn {
     health: 100
   }}
 
+  // ---
+
   bf := createPlayer()
   bf.pos.x <- 130
   bf.pos.y <- center().y + 100
 
+  speaker := add([
+    'speaker' |> s()
+
+    sprite('speaker' |> s())
+    anchor('center' |> s())
+
+    pos(center().x, center().y - 30)
+    scale(2.1)
+  ])
+
+  gf := createGhosty()
+  gf.pos.y <- center().x
+  gf.pos.y <- center().y + 90
+
+  // ---
+
   bpm := 60
   fn speedv() bpm / 60 / dt()
+  fn hspeedv() bpm / 2 / 60 / dt()
 
   bh! := createBeatHandler()
+  hbh! := createBeatHandler()
+  qbh! := createBeatHandler()
 
-  fn doBeat {
-    baseParallax.tweenBounce(1.5, 0.2)
-    bf.play('idle1' |> s())
+  fn doBeat(bk) if bk {
+    1 -> {
+      baseParallax.tweenBounce(1.5, 0.2)
+      bf.play('idle1' |> s())
+    }
+
+    2 -> {
+      gf.play('idle' |> s())
+      speaker.play('beat' |> s())
+    }
   }
 
-  with onUpdate() fn if bh!.activateBeat(bpm) = true -> doBeat()
+  with onUpdate() fn if bh!.activateBeat(bpm) = true -> doBeat(1)
+  with onUpdate() fn if hbh!.activateBeat(bpm * 2) = true -> doBeat(2)
 
   p1.bcont := sideState()
   p2.bcont := sideState()
   [lf, rt] := [p1.bcont, p2.bcont]
 
   scoreText := with baseParallax.add() [
-    with text('0 Points 0 Misses 0% Acc' |> s()) {
-      size: 15
-      font: 'arial' |> s()
-    }
     pos(0, hh! * 0.75)
     anchor('center' |> s())
     outline(200, mf_outline)
 
     // fns
-    {
-      scoreFmt: (
+    scoreCore := {
+      scoreFmt: scoreFmt := (
         '{{ 0 }} Points  ' <<
         '{{ 1 }} Misses  ' <<
         '{{ 2 }}% Accuracy'
       )
 
-      makeScoreText: fn(side) scoreText.scoreFmt |> fmt.format(
+      formScore: fn formScore(s, m, a) scoreFmt |> fmt.format(s, m, a)
+
+      makeScoreText: fn makeScoreText(side) formScore(
         side.bcont.score
         side.bcont.misses
         side.bcont.acc
       )
 
-      updateScore: fn(side) scoreText.text <- scoreText.makeScoreText(side)
+      updateScore: fn(side) scoreText.text <- makeScoreText(side)
+    }
+
+    with text(formScore(0, 0, 0) |> s()) {
+      size: 15
+      font: 'arial' |> s()
     }
   ]
 
@@ -212,7 +244,6 @@ with scene('songGame') fn {
     // Nowhere   0.2px
     // Emperor   0.5px
     // King      1px
-    // Absolute  1px
     // Godly     5px
     // Perfect   10px
     // Wow       15px
@@ -244,20 +275,22 @@ with scene('songGame') fn {
       mh := a.height / 2
       mult := Math.abs(mh - dst) + 1
 
-      b.bcont.score <- b.bcont.score + math.round(100 * mult)
+      hitPoints := (b.bcont.numOfNotes - b.bcont.misses) * 100
+      totalPossible := b.bcont.numOfNotes * 100
+      distanceMultiplier := math.max(1, 1 - (dst / 100))
 
-      highest := 100 * mh
+      b.bcont.score <- b.bcont.score + math.round(100 * mult)
+      b.bcont.numOfNotes <- b.bcont.numOfNotes + 1
+
+      acc! := if b.bcont.score > 0 {
+        ?, false -> 0
+        _ -> (hitPoints / totalPossible) * 100 * distanceMultiplier
+      }
+
+      b.bcont.acc <- math.round(acc!)
+      debug.log(acc!)
 
       scoreText.updateScore(b)
-
-      // Acc
-      normalizedDist := Math.min(1, Math.max(0, 1 - dst / mh))
-
-      accFloat := (
-        (b.bcont.acc * b.bcont.numOfNotes) + normalizedDist
-      ) / (b.bcont.numOfNotes + 1)
-
-      b.bcont.acc <- Math.round(accFloat * 100)
     }
 
     fn handleNoteClickDist(note) {
@@ -293,14 +326,24 @@ with scene('songGame') fn {
 
     with a.clickEvents.push() fn(note) {
       t := time()
-      if ((t - a.STATE_CHANGE_TIME) < 0.1) & (! note.Missed?) -> clickNote(note)
+
+      notMissed := ! note.Missed?
+      correctID := note.macroIndex = a.macroIndex
+      notTooQuick := (t - a.STATE_CHANGE_TIME) < 0.1
+
+      // Handle Click rule
+      if (! a.NEEDS_MACRO_INDEX) |
+        (notTooQuick & correctID & notMissed) -> clickNote(note)
     }
 
     fn handleMiss(note) {
       b.bcont.misses <- b.bcont.misses + 1
+      b.bcont.score <- math.max(b.bcont.score - 300, 0)
+
       note.Missed? <- true
       note.Pressed? <- false
       note.destroy()
+
       scoreText.updateScore(b)
     }
 
@@ -363,6 +406,7 @@ with scene('songGame') fn {
   }
 
   // Load chart
+  console.log()
 
   p1.trackNote!(1, 300)
   p1.trackNote!(2, 600)
